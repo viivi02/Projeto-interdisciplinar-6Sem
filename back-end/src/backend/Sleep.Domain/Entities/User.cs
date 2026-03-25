@@ -11,11 +11,12 @@ namespace Sleep.Domain.Entities
         public string Password { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string Gender { get; set; } = string.Empty;
-        [Column("height_kg")]
+        [Column("height_cm")]
         public decimal HeightCm { get; set; } = decimal.Zero;
-        [Column("weight_kg ")]
+        [Column("weight_kg")]
         public decimal WeightKg {  get; set; } = decimal.Zero;
         public UserStatus Status { get; set; }
         public Guid UserIdentifier { get; set; }
+        public string Occupation { get; set; } = string.Empty;
     }
 }

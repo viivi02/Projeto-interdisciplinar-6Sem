@@ -61,42 +61,6 @@ namespace Sleep.Exceptions {
         }
         
         /// <summary>
-        ///   Consulta uma cadeia de caracteres localizada semelhante a CPF already exists..
-        /// </summary>
-        public static string CPF_ALREADY_EXIST {
-            get {
-                return ResourceManager.GetString("CPF_ALREADY_EXIST", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Consulta uma cadeia de caracteres localizada semelhante a The CPF cannot be empty..
-        /// </summary>
-        public static string CPF_EMPTY {
-            get {
-                return ResourceManager.GetString("CPF_EMPTY", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Consulta uma cadeia de caracteres localizada semelhante a The CPF is invalid..
-        /// </summary>
-        public static string CPF_INVALID {
-            get {
-                return ResourceManager.GetString("CPF_INVALID", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Consulta uma cadeia de caracteres localizada semelhante a The id or password is incorrect..
-        /// </summary>
-        public static string CPF_OR_PASSWORD_INCORRECT {
-            get {
-                return ResourceManager.GetString("CPF_OR_PASSWORD_INCORRECT", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Consulta uma cadeia de caracteres localizada semelhante a E-mail already registered..
         /// </summary>
         public static string EMAIL_ALREADY_REGISTERED {
@@ -124,20 +88,20 @@ namespace Sleep.Exceptions {
         }
         
         /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a The email or password is incorret..
+        /// </summary>
+        public static string EMAIL_OR_PASSWORD_INCORRECT {
+            get {
+                return ResourceManager.GetString("EMAIL_OR_PASSWORD_INCORRECT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Consulta uma cadeia de caracteres localizada semelhante a The gender is invalid..
         /// </summary>
         public static string GENDER_INVALID {
             get {
                 return ResourceManager.GetString("GENDER_INVALID", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Consulta uma cadeia de caracteres localizada semelhante a The income cannot be empty..
-        /// </summary>
-        public static string INCOME_EMPTY {
-            get {
-                return ResourceManager.GetString("INCOME_EMPTY", resourceCulture);
             }
         }
         
@@ -151,7 +115,7 @@ namespace Sleep.Exceptions {
         }
         
         /// <summary>
-        ///   Consulta uma cadeia de caracteres localizada semelhante a The occupation cannot be empty..
+        ///   Consulta uma cadeia de caracteres localizada semelhante a Occupation cannot be empty..
         /// </summary>
         public static string OCCUPATION_EMPTY {
             get {

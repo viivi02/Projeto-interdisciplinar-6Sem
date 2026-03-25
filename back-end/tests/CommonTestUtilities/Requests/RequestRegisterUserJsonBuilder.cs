@@ -18,7 +18,8 @@ namespace CommonTestUtilities.Requests
                 .RuleFor(u => u.BirthDate, (f) => f.Person.DateOfBirth)
                 .RuleFor(u => u.Gender, (f) => f.PickRandom(valideGender).ToString())
                 .RuleFor(u => u.HeightCm, f => f.Random.Number(1,220))
-                .RuleFor(u => u.WeightKg, f => f.Random.Number(1,300));
+                .RuleFor(u => u.WeightKg, f => f.Random.Number(1,300))
+                .RuleFor(u => u.Occupation, f => f.Name.JobTitle());
         }
     }
 }

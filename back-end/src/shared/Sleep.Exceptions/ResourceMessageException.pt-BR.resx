@@ -132,28 +132,16 @@
   <data name="EMAIL_INVALID" xml:space="preserve">
     <value>O E-mail está invalido.</value>
   </data>
-  <data name="CPF_EMPTY" xml:space="preserve">
-    <value>O CPF não pode ser vazio.</value>
-  </data>
-  <data name="CPF_INVALID" xml:space="preserve">
-    <value>O CPF é invalido.</value>
-  </data>
   <data name="EMAIL_ALREADY_REGISTERED" xml:space="preserve">
     <value>E-mail já está cadastrado.</value>
-  </data>
-  <data name="CPF_ALREADY_EXIST" xml:space="preserve">
-    <value>O CPF já está cadastrado.</value>
-  </data>
-  <data name="OCCUPATION_EMPTY" xml:space="preserve">
-    <value>A profissão não pode ser vazia.</value>
-  </data>
-  <data name="INCOME_EMPTY" xml:space="preserve">
-    <value>A renda não pode ser vazia.</value>
   </data>
   <data name="GENDER_INVALID" xml:space="preserve">
     <value>O gênero é invalido.</value>
   </data>
-  <data name="CPF_OR_PASSWORD_INCORRECT" xml:space="preserve">
-    <value>O CPF ou à senha estão errados.</value>
+  <data name="EMAIL_OR_PASSWORD_INCORRECT" xml:space="preserve">
+    <value>O E-mail ou a senha estão inválidos.</value>
+  </data>
+  <data name="OCCUPATION_EMPTY" xml:space="preserve">
+    <value>A ocupação não pode ser vazia.</value>
   </data>
 </root>

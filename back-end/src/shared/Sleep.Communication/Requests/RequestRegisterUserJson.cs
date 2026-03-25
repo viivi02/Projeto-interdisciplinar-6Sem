@@ -9,5 +9,6 @@
         public string Gender { get; set; } = string.Empty;
         public decimal HeightCm { get; set; } = decimal.Zero;
         public decimal WeightKg { get; set; } = decimal.Zero;
+        public string Occupation { get; set; } = string.Empty;
     }
 }

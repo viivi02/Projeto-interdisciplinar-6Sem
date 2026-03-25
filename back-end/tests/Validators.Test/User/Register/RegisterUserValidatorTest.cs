@@ -58,6 +58,19 @@ namespace Validators.Test.User.Register
                 .And.Contain(e => e.ErrorMessage.Equals(ResourceMessageException.EMAIL_INVALID));
         }
 
+        [Fact]
+        public void Error_Occupation_Empty()
+        {
+            var validator = new RegisterUserValidator();
+            var request = RequestRegisterUserJsonBuilder.Build();
+            request.Occupation = string.Empty;
+            var result = validator.Validate(request);
+
+            result.IsValid.Should().BeFalse();
+            result.Errors.Should().ContainSingle()
+                .And.Contain(e => e.ErrorMessage.Equals(ResourceMessageException.OCCUPATION_EMPTY));
+        }
+
         [Theory]
         [InlineData(1)]
         [InlineData(2)]

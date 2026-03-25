@@ -19,6 +19,8 @@ namespace Sleep.Application.UseCases.User.Register
             RuleFor(user => user.Gender)
                 .Must(g => g == "F" || g == "M")
                 .WithMessage(ResourceMessageException.GENDER_INVALID);
+            RuleFor(user => user.Occupation).NotEmpty().WithMessage(ResourceMessageException.OCCUPATION_EMPTY);
+            RuleFor(user => user.Occupation).NotNull().WithMessage(ResourceMessageException.OCCUPATION_EMPTY);
         }
     }
 }

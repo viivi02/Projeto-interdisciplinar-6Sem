@@ -4,7 +4,7 @@ namespace Sleep.Exceptions.ExceptionsBase
 {
     public class InvalidLoginException : BusinessException
     {
-        public InvalidLoginException() : base(ResourceMessageException.CPF_OR_PASSWORD_INCORRECT)
+        public InvalidLoginException() : base(ResourceMessageException.EMAIL_OR_PASSWORD_INCORRECT)
         {
         }
 

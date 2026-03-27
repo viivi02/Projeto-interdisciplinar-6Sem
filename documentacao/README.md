@@ -98,3 +98,9 @@ Banco de Dados (MySQL)
 ## Diagrama de Caso de Uso
 
 ![Diagrama de caso de uso](https://github.com/viivi02/Projeto-interdisciplinar-6Sem/blob/c8b82035db35ed0ecc512e0942e9cd63d882f5b1/documentacao/Diagrama%20Caso%20de%20Uso%20Pi.drawio.png)
+
+---
+
+## Prototipo telas
+
+![Telas](https://github.com/viivi02/Projeto-interdisciplinar-6Sem/blob/49c22f657c2247ab7c15484d44670dd075a56cc4/documentacao/Qr_code_prototipo.png)

@@ -101,6 +101,4 @@ Banco de Dados (MySQL)
 
 ---
 
-## Prototipo telas
 
-![Telas](https://github.com/viivi02/Projeto-interdisciplinar-6Sem/blob/49c22f657c2247ab7c15484d44670dd075a56cc4/documentacao/Qr_code_prototipo.png)

@@ -95,6 +95,9 @@ Banco de Dados (MySQL)
 
 ---
 
+## Diagrama do Banco de dados
+![Diagrama banco de dados](documentacao/diagrama_lógico.png)
+
 ## Diagrama de Caso de Uso
 
 ![Diagrama de caso de uso](https://github.com/viivi02/Projeto-interdisciplinar-6Sem/blob/c8b82035db35ed0ecc512e0942e9cd63d882f5b1/documentacao/Diagrama%20Caso%20de%20Uso%20Pi.drawio.png)

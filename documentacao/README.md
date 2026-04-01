@@ -104,4 +104,7 @@ Banco de Dados (MySQL)
 
 ---
 
+## Protótipo inicial Figma
+
+[Acesse as telas clicando aqui.](https://www.figma.com/design/oedYNaWTFgdrCs3Wfb1smd/pi6?node-id=0-1&t=C4XY1KtGICzSdlfC-1)
 

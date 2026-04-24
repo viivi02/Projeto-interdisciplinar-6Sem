@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using System.Text.RegularExpressions;
-using Sleep.Communication.Requests;
 using Sleep.Exceptions;
+using Sleep.Communication.Requests.User;
 
 namespace Sleep.Application.UseCases.User.Register
 {
@@ -21,6 +21,7 @@ namespace Sleep.Application.UseCases.User.Register
                 .WithMessage(ResourceMessageException.GENDER_INVALID);
             RuleFor(user => user.Occupation).NotEmpty().WithMessage(ResourceMessageException.OCCUPATION_EMPTY);
             RuleFor(user => user.Occupation).NotNull().WithMessage(ResourceMessageException.OCCUPATION_EMPTY);
+            RuleFor(user => user.SleepDisorder).IsInEnum().WithMessage(ResourceMessageException.SLEEP_DISORDER_INVALID);
         }
     }
 }

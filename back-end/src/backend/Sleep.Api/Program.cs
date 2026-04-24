@@ -56,6 +56,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddInfrasctructure(builder.Configuration);
 builder.Services.AddScoped<ITokenProvider, HttpContextTokenValue>();
 builder.Services.AddApplication(builder.Configuration);
+builder.Services.AddRouting(opt => opt.LowercaseUrls = true);
 
 var app = builder.Build();
 

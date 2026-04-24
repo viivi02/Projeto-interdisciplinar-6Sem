@@ -1,4 +1,6 @@
-﻿namespace Sleep.Communication.Requests
+﻿using Sleep.Domain.Enum;
+
+namespace Sleep.Communication.Requests.User
 {
     public class RequestRegisterUserJson
     {
@@ -10,5 +12,6 @@
         public decimal HeightCm { get; set; } = decimal.Zero;
         public decimal WeightKg { get; set; } = decimal.Zero;
         public string Occupation { get; set; } = string.Empty;
+        public SleepDisorder SleepDisorder { get; set; }
     }
 }

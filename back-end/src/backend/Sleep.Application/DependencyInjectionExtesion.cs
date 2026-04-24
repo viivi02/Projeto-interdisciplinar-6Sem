@@ -5,6 +5,8 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Sleep.Application.Services.AutoMapper;
 using Sleep.Application.Services.Cryptography;
 using Sleep.Application.UseCases.Auth.Login;
+using Sleep.Application.UseCases.Sleep.Create;
+using Sleep.Application.UseCases.Sleep.Get.SleepHistory;
 using Sleep.Application.UseCases.User.Register;
 
 namespace Sleep.Application
@@ -30,6 +32,8 @@ namespace Sleep.Application
         {
             services.AddScoped<IRegisterUserUseCase, RegisterUserUseCase>();
             services.AddScoped<IDoLoginUseCase, DoLoginUseCase>();
+            services.AddScoped<ICreateSleepRecordUseCase, CreateSleepRecordUseCase>();
+            services.AddScoped<IGetSleepHistoryUseCase, GetSleepHistoryUseCase>();
         }
 
         private static void AddPasswordEncrypter(IServiceCollection services, IConfiguration configuration)

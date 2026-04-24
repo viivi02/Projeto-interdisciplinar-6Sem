@@ -1,6 +1,6 @@
 ﻿using Bogus;
 using Bogus.Extensions.Brazil;
-using Sleep.Communication.Requests;
+using Sleep.Communication.Requests.User;
 using Sleep.Domain.Enum;
 
 namespace CommonTestUtilities.Requests
@@ -19,7 +19,8 @@ namespace CommonTestUtilities.Requests
                 .RuleFor(u => u.Gender, (f) => f.PickRandom(valideGender).ToString())
                 .RuleFor(u => u.HeightCm, f => f.Random.Number(1,220))
                 .RuleFor(u => u.WeightKg, f => f.Random.Number(1,300))
-                .RuleFor(u => u.Occupation, f => f.Name.JobTitle());
+                .RuleFor(u => u.Occupation, f => f.Name.JobTitle())
+                .RuleFor(u => u.SleepDisorder, f => f.PickRandom<SleepDisorder>());
         }
     }
 }

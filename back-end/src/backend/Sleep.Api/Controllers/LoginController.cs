@@ -3,6 +3,7 @@ using Sleep.Application.UseCases.Auth.Login;
 using Sleep.Communication.Requests.Login;
 using Sleep.Communication.Responses;
 using Sleep.Communication.Responses.Token;
+using System.Runtime.CompilerServices;
 
 namespace Sleep.Api.Controllers
 {

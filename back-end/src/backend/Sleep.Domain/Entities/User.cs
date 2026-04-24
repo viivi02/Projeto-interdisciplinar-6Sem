@@ -3,6 +3,7 @@ using Sleep.Domain.Enum;
 
 namespace Sleep.Domain.Entities
 {
+    [Table("users")]
     public class User : EntityBase
     {
         public string Name { get; set; } = string.Empty;
@@ -18,5 +19,7 @@ namespace Sleep.Domain.Entities
         public UserStatus Status { get; set; }
         public Guid UserIdentifier { get; set; }
         public string Occupation { get; set; } = string.Empty;
+        [Column("sleep_disorder")]
+        public SleepDisorder SleepDisorder { get; set; }
     }
 }

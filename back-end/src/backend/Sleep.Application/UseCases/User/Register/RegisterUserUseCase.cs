@@ -2,7 +2,6 @@
 using Sleep.Application.Services.Cryptography;
 using System.ComponentModel.DataAnnotations;
 using Sleep.Application.Tokens;
-using Sleep.Communication.Requests;
 using Sleep.Communication.Responses;
 using Sleep.Communication.Responses.Token;
 using Sleep.Domain.Entities;
@@ -12,6 +11,7 @@ using Sleep.Domain.Repositories.User;
 using Sleep.Domain.Security.Cryptography;
 using Sleep.Exceptions;
 using Sleep.Exceptions.ExceptionsBase;
+using Sleep.Communication.Requests.User;
 
 namespace Sleep.Application.UseCases.User.Register
 {

@@ -144,4 +144,37 @@
   <data name="OCCUPATION_EMPTY" xml:space="preserve">
     <value>Occupation cannot be empty.</value>
   </data>
+  <data name="RECORD_DATE_NULL" xml:space="preserve">
+    <value>The record date can't be null.</value>
+  </data>
+  <data name="SLEEP_END_DATE_LESS_THAN_START" xml:space="preserve">
+    <value>The date can't be lesser than start.</value>
+  </data>
+  <data name="VALUE_BETWEEN_1_10" xml:space="preserve">
+    <value>The value has to be between 1 and 10.</value>
+  </data>
+  <data name="PHYSICAL_ACTIVY_MINUTES_NOT_EMPTY" xml:space="preserve">
+    <value>The physical activity cant be empty.</value>
+  </data>
+  <data name="BMI_INVALID" xml:space="preserve">
+    <value>The BMI is invalid.</value>
+  </data>
+  <data name="BLOOD_PRESSURE_EMPTY" xml:space="preserve">
+    <value>The blood pressure cant be empty.</value>
+  </data>
+  <data name="RECORD_DATE_ALREADY_EXIST" xml:space="preserve">
+    <value>The date already exists.</value>
+  </data>
+  <data name="SLEEP_DISORDER_INVALID" xml:space="preserve">
+    <value>The sleep disorder is invalid</value>
+  </data>
+  <data name="DAILY_STEPS_EMPTY" xml:space="preserve">
+    <value>The daily steps cannot be empty.</value>
+  </data>
+  <data name="HEART_RATE_EMPTY" xml:space="preserve">
+    <value>The heart rate cannot be empty.</value>
+  </data>
+  <data name="END_DATE_GREATER_THAN_START" xml:space="preserve">
+    <value>The end date can't be greater than start date.</value>
+  </data>
 </root>

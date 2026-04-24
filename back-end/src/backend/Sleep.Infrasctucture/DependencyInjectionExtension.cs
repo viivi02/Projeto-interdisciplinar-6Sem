@@ -15,6 +15,8 @@ using Sleep.Infrasctructure.Security.Cryptography;
 using Sleep.Infrasctructure.Security.Token.Access;
 using Sleep.Infrasctructure.Services.LoggedUser;
 using Sleep.Infrasctucture.DataAccess;
+using Sleep.Domain.Repositories.SleepRecord;
+using Sleep.Infrasctructure.DataAccess.Repositories.SleepRecord;
 
 
 namespace Sleep.Infrasctucture
@@ -49,6 +51,8 @@ namespace Sleep.Infrasctucture
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IUserRepositoryReadOnly, UserRepository>();
             services.AddScoped<IUserRepositoryWriteOnly, UserRepository>();
+            services.AddScoped<ISleepRecordRepositoryReadOnly, SleepRecordRepository>();
+            services.AddScoped<ISleepRecordRepositoryWriteOnly, SleepRecordRepository>();
         }
 
         private static void AddTokens(IServiceCollection services, IConfiguration configuration)

@@ -8,6 +8,7 @@ namespace Sleep.Infrasctucture.DataAccess
         public SleepDbContext(DbContextOptions options) : base(options) { }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<SleepRecord> SleepRecord { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {   

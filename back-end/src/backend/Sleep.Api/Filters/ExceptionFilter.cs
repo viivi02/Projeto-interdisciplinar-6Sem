@@ -22,12 +22,14 @@ namespace Sleep.Api.Filters
 
         private static void ThrowUnkowException(ExceptionContext context)
         {
+            System.Diagnostics.Debug.WriteLine($"[ERROR] {context.Exception}");
             context.HttpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
             context.Result = new ObjectResult(new ResponseErrorJson(ResourceMessageException.UNKNOW_ERROR));
         }
 
         private static void HandleProjectException(ExceptionContext context, BusinessException sleepException)
         {
+            System.Diagnostics.Debug.WriteLine($"[WARN] {context.Exception}");
             context.HttpContext.Response.StatusCode = (int)sleepException.GetStatusCode();
             context.Result = new ObjectResult(new ResponseErrorJson(sleepException.GetErrorMessages()));
         }

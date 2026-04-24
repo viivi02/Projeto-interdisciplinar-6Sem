@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Sleep.Application.UseCases.User.Register;
-using Sleep.Communication.Requests;
+using Sleep.Communication.Requests.User;
 using Sleep.Communication.Responses;
 
 namespace Sleep.Api.Controllers

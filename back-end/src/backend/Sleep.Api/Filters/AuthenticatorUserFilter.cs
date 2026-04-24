@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Pomelo.EntityFrameworkCore.MySql.Query.ExpressionVisitors.Internal;
 using Sleep.Application.Tokens;
 using Sleep.Domain.Repositories.User;
 

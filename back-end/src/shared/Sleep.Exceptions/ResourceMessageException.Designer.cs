@@ -61,6 +61,33 @@ namespace Sleep.Exceptions {
         }
         
         /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a The blood pressure cant be empty..
+        /// </summary>
+        public static string BLOOD_PRESSURE_EMPTY {
+            get {
+                return ResourceManager.GetString("BLOOD_PRESSURE_EMPTY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a The BMI is invalid..
+        /// </summary>
+        public static string BMI_INVALID {
+            get {
+                return ResourceManager.GetString("BMI_INVALID", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a The daily steps cannot be empty..
+        /// </summary>
+        public static string DAILY_STEPS_EMPTY {
+            get {
+                return ResourceManager.GetString("DAILY_STEPS_EMPTY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Consulta uma cadeia de caracteres localizada semelhante a E-mail already registered..
         /// </summary>
         public static string EMAIL_ALREADY_REGISTERED {
@@ -97,11 +124,29 @@ namespace Sleep.Exceptions {
         }
         
         /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a The end date can&apos;t be greater than start date..
+        /// </summary>
+        public static string END_DATE_GREATER_THAN_START {
+            get {
+                return ResourceManager.GetString("END_DATE_GREATER_THAN_START", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Consulta uma cadeia de caracteres localizada semelhante a The gender is invalid..
         /// </summary>
         public static string GENDER_INVALID {
             get {
                 return ResourceManager.GetString("GENDER_INVALID", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a The heart rate cannot be empty..
+        /// </summary>
+        public static string HEART_RATE_EMPTY {
+            get {
+                return ResourceManager.GetString("HEART_RATE_EMPTY", resourceCulture);
             }
         }
         
@@ -133,11 +178,65 @@ namespace Sleep.Exceptions {
         }
         
         /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a The physical activity cant be empty..
+        /// </summary>
+        public static string PHYSICAL_ACTIVY_MINUTES_NOT_EMPTY {
+            get {
+                return ResourceManager.GetString("PHYSICAL_ACTIVY_MINUTES_NOT_EMPTY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a The date already exists..
+        /// </summary>
+        public static string RECORD_DATE_ALREADY_EXIST {
+            get {
+                return ResourceManager.GetString("RECORD_DATE_ALREADY_EXIST", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a The record date can&apos;t be null..
+        /// </summary>
+        public static string RECORD_DATE_NULL {
+            get {
+                return ResourceManager.GetString("RECORD_DATE_NULL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a The sleep disorder is invalid.
+        /// </summary>
+        public static string SLEEP_DISORDER_INVALID {
+            get {
+                return ResourceManager.GetString("SLEEP_DISORDER_INVALID", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a The date can&apos;t be lesser than start..
+        /// </summary>
+        public static string SLEEP_END_DATE_LESS_THAN_START {
+            get {
+                return ResourceManager.GetString("SLEEP_END_DATE_LESS_THAN_START", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Consulta uma cadeia de caracteres localizada semelhante a Unknow error..
         /// </summary>
         public static string UNKNOW_ERROR {
             get {
                 return ResourceManager.GetString("UNKNOW_ERROR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a The value has to be between 1 and 10..
+        /// </summary>
+        public static string VALUE_BETWEEN_1_10 {
+            get {
+                return ResourceManager.GetString("VALUE_BETWEEN_1_10", resourceCulture);
             }
         }
     }

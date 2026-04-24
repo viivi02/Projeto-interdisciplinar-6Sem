@@ -4,14 +4,14 @@ using Sleep.Infrastructure.Migrations;
 
 namespace Sleep.Infrasctructure.Migrations.Versions
 {
-    [Migration(DatabaseVersions.USER_ADD_OCCUPATION, "Adding column Occupation for table users")]
-    public class Version0000003 : ForwardOnlyMigration
+    [Migration(DatabaseVersions.USER_ADD_SLEEP_DISORDER, "Adding column Sleep Disorder for table users")]
+    public class Version0000006 : ForwardOnlyMigration
     {
         public override void Up()
         {
             Alter.Table("users")
-                .AddColumn("Occupation")
-                .AsString()
+                .AddColumn("sleep_disorder")
+                .AsInt16()
                 .NotNullable();
         }
     }

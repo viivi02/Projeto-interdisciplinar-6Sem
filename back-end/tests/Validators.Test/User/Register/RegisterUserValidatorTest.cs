@@ -1,6 +1,7 @@
 ﻿using CommonTestUtilities.Requests;
 using FluentAssertions;
 using Sleep.Application.UseCases.User.Register;
+using Sleep.Domain.Enum;
 using Sleep.Exceptions;
 
 namespace Validators.Test.User.Register
@@ -69,6 +70,19 @@ namespace Validators.Test.User.Register
             result.IsValid.Should().BeFalse();
             result.Errors.Should().ContainSingle()
                 .And.Contain(e => e.ErrorMessage.Equals(ResourceMessageException.OCCUPATION_EMPTY));
+        }
+
+        [Fact]
+        public void Sleep_Disorder_Invalid()
+        {
+            var validator = new RegisterUserValidator();
+            var request = RequestRegisterUserJsonBuilder.Build();
+            request.SleepDisorder = (SleepDisorder)111; 
+            var result = validator.Validate(request);
+
+            result.IsValid.Should().BeFalse();
+            result.Errors.Should().ContainSingle()
+                .And.Contain(e => e.ErrorMessage.Equals(ResourceMessageException.SLEEP_DISORDER_INVALID));
         }
 
         [Theory]

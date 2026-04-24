@@ -144,4 +144,37 @@
   <data name="OCCUPATION_EMPTY" xml:space="preserve">
     <value>A ocupação não pode ser vazia.</value>
   </data>
+  <data name="RECORD_DATE_NULL" xml:space="preserve">
+    <value>A data de registro não pode ser nula.</value>
+  </data>
+  <data name="SLEEP_END_DATE_LESS_THAN_START" xml:space="preserve">
+    <value>A data de fim não pode ser maior que data de início.</value>
+  </data>
+  <data name="VALUE_BETWEEN_1_10" xml:space="preserve">
+    <value>O valor deve estar entre 1 e 10.</value>
+  </data>
+  <data name="PHYSICAL_ACTIVY_MINUTES_NOT_EMPTY" xml:space="preserve">
+    <value>O campo de atividade física não pode ser vazio.</value>
+  </data>
+  <data name="BMI_INVALID" xml:space="preserve">
+    <value>O IMC é inválido.</value>
+  </data>
+  <data name="BLOOD_PRESSURE_EMPTY" xml:space="preserve">
+    <value>A pressão sanguínea não pode ser vazia.</value>
+  </data>
+  <data name="RECORD_DATE_ALREADY_EXIST" xml:space="preserve">
+    <value>A data enviada já existe. </value>
+  </data>
+  <data name="SLEEP_DISORDER_INVALID" xml:space="preserve">
+    <value>O distúrbio do sono é inválido</value>
+  </data>
+  <data name="DAILY_STEPS_EMPTY" xml:space="preserve">
+    <value>Os passos diários não pode ser vazio.</value>
+  </data>
+  <data name="HEART_RATE_EMPTY" xml:space="preserve">
+    <value>Os batimento cardíacos não podem ser vazios.</value>
+  </data>
+  <data name="END_DATE_GREATER_THAN_START" xml:space="preserve">
+    <value>A data fim não pode ser maior que a data começo.</value>
+  </data>
 </root>

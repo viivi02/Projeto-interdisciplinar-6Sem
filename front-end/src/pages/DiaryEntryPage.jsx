@@ -13,8 +13,11 @@ const initialDiaryState = {
   sleepQuality: 8,
   mentalFatigue: 4,
   heartRate: "",
-  bloodPressure: "",
+  bloodPressureRaw: "",
+  systolic: "",
+  diastolic: "",
   dailySteps: "",
+  screenTimeBeforeSleep: "",
   habits: {
     caffeine: false,
     screens: true,
@@ -46,6 +49,36 @@ function getSleepQualityLabel(value) {
   return "Descanso profundo";
 }
 
+function parseBloodPressure(value) {
+  const normalizedValue = value.trim();
+
+  if (!normalizedValue) {
+    return {
+      systolic: "",
+      diastolic: "",
+      isValid: true
+    };
+  }
+
+  if (!/^\d+\/\d+$/.test(normalizedValue)) {
+    return {
+      systolic: "",
+      diastolic: "",
+      isValid: false
+    };
+  }
+
+  const [systolicRaw, diastolicRaw] = normalizedValue.split("/");
+  const systolic = Number(systolicRaw);
+  const diastolic = Number(diastolicRaw);
+
+  return {
+    systolic,
+    diastolic,
+    isValid: Number.isFinite(systolic) && Number.isFinite(diastolic)
+  };
+}
+
 export default function DiaryEntryPage() {
   const [formData, setFormData] = useState(initialDiaryState);
   const [saveMessage, setSaveMessage] = useState("");
@@ -54,9 +87,27 @@ export default function DiaryEntryPage() {
     () => calculateSleepDuration(formData.sleepTime, formData.wakeTime),
     [formData.sleepTime, formData.wakeTime]
   );
+  const bloodPressureStatus = useMemo(
+    () => parseBloodPressure(formData.bloodPressureRaw),
+    [formData.bloodPressureRaw]
+  );
 
   const handleFieldChange = (event) => {
     const { name, value } = event.target;
+
+    if (name === "bloodPressureRaw") {
+      if (!/^[\d/]*$/.test(value)) return;
+
+      const parsedBloodPressure = parseBloodPressure(value);
+      setFormData((currentData) => ({
+        ...currentData,
+        bloodPressureRaw: value,
+        systolic: parsedBloodPressure.systolic,
+        diastolic: parsedBloodPressure.diastolic
+      }));
+      return;
+    }
+
     setFormData((currentData) => ({ ...currentData, [name]: value }));
   };
 
@@ -85,10 +136,14 @@ export default function DiaryEntryPage() {
       quality: `${formData.sleepQuality}/10`,
       mentalFatigue: `${formData.mentalFatigue}/10`,
       heartRate: formData.heartRate ? `${formData.heartRate} bpm` : "",
-      bloodPressure: formData.bloodPressure,
+      bloodPressure: bloodPressureStatus.isValid ? formData.bloodPressureRaw : "",
+      bloodPressureRaw: formData.bloodPressureRaw,
+      systolic: bloodPressureStatus.isValid ? bloodPressureStatus.systolic : "",
+      diastolic: bloodPressureStatus.isValid ? bloodPressureStatus.diastolic : "",
       steps: formData.dailySteps,
       caffeine: formData.habits.caffeine,
       phoneBeforeSleep: formData.habits.screens,
+      screenTimeBeforeSleep: formData.screenTimeBeforeSleep ? `${formData.screenTimeBeforeSleep} min` : "",
       alcohol: formData.habits.alcohol,
       note: `Atividade ${formData.physicalActivity.toLowerCase()} com qualidade ${formData.sleepQuality}/10 e estresse ${formData.stressLevel}/10.`,
       sleepScore: Math.round(
@@ -215,10 +270,25 @@ export default function DiaryEntryPage() {
                 <input type="number" name="heartRate" value={formData.heartRate} onChange={handleFieldChange} min="0" placeholder="72" />
               </Field>
               <Field label="Pressao arterial">
-                <input type="text" name="bloodPressure" value={formData.bloodPressure} onChange={handleFieldChange} placeholder="120/80" />
+                <input
+                  type="text"
+                  name="bloodPressureRaw"
+                  value={formData.bloodPressureRaw}
+                  onChange={handleFieldChange}
+                  placeholder="120/80"
+                  inputMode="text"
+                  aria-invalid={!bloodPressureStatus.isValid}
+                />
+                {!bloodPressureStatus.isValid && (
+                  <span className="field-hint field-hint--warning">Use o formato 120/80.</span>
+                )}
               </Field>
               <Field label="Passos diarios">
                 <input type="number" name="dailySteps" value={formData.dailySteps} onChange={handleFieldChange} min="0" placeholder="7200" />
+              </Field>
+              <Field label="Tempo de tela antes de dormir">
+                <input type="number" name="screenTimeBeforeSleep" value={formData.screenTimeBeforeSleep} onChange={handleFieldChange} min="0" placeholder="30" />
+                <span className="field-hint">{formData.screenTimeBeforeSleep ? `${formData.screenTimeBeforeSleep} min` : "Opcional, em minutos"}</span>
               </Field>
             </div>
           </section>

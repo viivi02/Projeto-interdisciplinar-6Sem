@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { MetricCard } from "../components/Card.jsx";
 import MaterialIcon from "../components/MaterialIcon.jsx";
 import MobileNav from "../components/MobileNav.jsx";
@@ -7,8 +8,34 @@ import { getCurrentUser } from "../utils/auth.js";
 const bedroomImage =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuDIS7q4E5zLYXvCy3rfRr10svl--_LKJhb4cl6PJs8os5zKCwDR7qmUGJf0t52cR5Jrla00NDMH6t6_nWKZH-zojkZF0ZmPIe4-qOq_GLQTV5O15KC_BGmax7WP2Pfn-b5VMFU6izZemd5fCjDQrCcsIVmVAFBRgd9H7E_oyExGen_XgI7p6FxvjstYu-ufm7MGgNywrpH5lsW09XBRoSp1I6X9XH8KHJLKRmGr_fgnQ2ldsJ5eSbdSXmj0AiwxkJ4LxDKSUZyeppQ";
 
+function getGreetingByHour(date = new Date()) {
+  const hour = date.getHours();
+
+  if (hour >= 5 && hour < 12) {
+    return "Bom dia";
+  }
+
+  if (hour >= 12 && hour < 18) {
+    return "Boa tarde";
+  }
+
+  return "Boa noite";
+}
+
+function getFormattedCurrentDate(date = new Date()) {
+  return date.toLocaleDateString("pt-BR", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric"
+  });
+}
+
 export default function DashboardPage() {
   const currentUser = getCurrentUser();
+  const [currentDate, setCurrentDate] = useState(() => new Date());
+  const greeting = getGreetingByHour(currentDate);
+  const formattedCurrentDate = getFormattedCurrentDate(currentDate);
   const bars = [
     ["SEG", 60],
     ["TER", 85],
@@ -23,14 +50,22 @@ export default function DashboardPage() {
     window.location.hash = "/diario";
   };
 
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setCurrentDate(new Date());
+    }, 60000);
+
+    return () => window.clearInterval(intervalId);
+  }, []);
+
   return (
     <div className="app-shell">
       <SideNav active="home" />
       <main className="main main--wide">
         <header className="page-header">
           <div>
-            <h2>Bom dia, {currentUser?.name || "Usuario"}</h2>
-            <p>Sexta-feira, 24 de Maio</p>
+            <h2>{greeting}, {currentUser?.name || "Usuario"}</h2>
+            <p>{formattedCurrentDate}</p>
           </div>
           <button className="btn btn--primary btn--large" type="button" onClick={handleAddSleepData}>
             <MaterialIcon>add</MaterialIcon>

@@ -38,6 +38,11 @@ def preprocess_data(df):
     df = df.dropna(subset=[target])
 
     if "phone_usage_before_sleep_minutes" in df.columns:
+        df["phone_usage_before_sleep_minutes"] = pd.to_numeric(
+            df["phone_usage_before_sleep_minutes"],
+            errors="coerce"
+        )
+
         df["used_phone_before_sleep"] = (
             df["phone_usage_before_sleep_minutes"] > 0
         ).astype(int)
@@ -50,7 +55,6 @@ def preprocess_data(df):
     cols_to_drop = [
         target,
         "user_id",
-        "phone_usage_before_sleep_minutes",
         "caffeine_intake_cups",
         "daily_screen_time_hours",
         "notifications_received_per_day"
@@ -86,8 +90,8 @@ def train_regression_model(X, y):
     )
 
     model = RandomForestRegressor(
-        n_estimators=200,
-        random_state=42
+        n_estimators=300,
+        random_state=10
     )
 
     model.fit(X_train, y_train)

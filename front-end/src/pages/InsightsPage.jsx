@@ -1,7 +1,9 @@
+import { useEffect, useState } from "react";
 import { MetricCard } from "../components/Card.jsx";
 import MaterialIcon from "../components/MaterialIcon.jsx";
 import MobileNav from "../components/MobileNav.jsx";
 import SideNav from "../components/SideNav.jsx";
+import { getInsights } from "../services/api.js";
 
 const trendBars = [
   ["SEG", 68],
@@ -40,7 +42,61 @@ const recommendations = [
   "Registrar cafeina e estresse no diario para refinar os proximos insights."
 ];
 
+function formatAverageSleep(hoursValue) {
+  const hoursNumber = Number(hoursValue);
+
+  if (!Number.isFinite(hoursNumber)) {
+    return "7h 36m";
+  }
+
+  const hours = Math.floor(hoursNumber);
+  const minutes = Math.round((hoursNumber - hours) * 60);
+  return `${hours}h ${String(minutes).padStart(2, "0")}m`;
+}
+
+function buildQuickInsights(patterns) {
+  if (!Array.isArray(patterns) || patterns.length === 0) {
+    return quickInsights;
+  }
+
+  return patterns.map((pattern, index) => ({
+    icon: index === 0 ? "psychology" : "schedule",
+    title: pattern,
+    text: "Padrao identificado a partir dos registros recebidos do backend.",
+    tone: index % 2 === 0 ? "primary" : "secondary"
+  }));
+}
+
 export default function InsightsPage() {
+  const [insights, setInsights] = useState(null);
+  const displayedRecommendations = insights?.recommendations || recommendations;
+  const displayedQuickInsights = buildQuickInsights(insights?.patterns);
+  const averageSleep = formatAverageSleep(insights?.averageSleep);
+  const averageScore = Number.isFinite(Number(insights?.averageScore))
+    ? `${Math.round(Number(insights.averageScore))}%`
+    : "84%";
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadInsights() {
+      try {
+        const data = await getInsights();
+        if (isMounted) {
+          setInsights(data);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar insights na API:", error);
+      }
+    }
+
+    loadInsights();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   return (
     <div className="app-shell">
       <SideNav active="insights" />
@@ -67,7 +123,7 @@ export default function InsightsPage() {
               ponto com maior potencial de melhora.
             </p>
             <div className="insight-summary__score">
-              <strong>84%</strong>
+              <strong>{averageScore}</strong>
               <span>qualidade media</span>
             </div>
           </section>
@@ -76,7 +132,7 @@ export default function InsightsPage() {
             <MetricCard
               icon={<MaterialIcon>bedtime</MaterialIcon>}
               label="Sono medio"
-              value="7h 36m"
+              value={averageSleep}
               detail="+18m vs semana anterior"
               color="primary"
             />
@@ -125,7 +181,7 @@ export default function InsightsPage() {
               </span>
             </div>
             <div className="insight-list">
-              {quickInsights.map((item) => (
+              {displayedQuickInsights.map((item) => (
                 <article className="insight-list__item" key={item.title}>
                   <span className={`round-icon round-icon--${item.tone}`}>
                     <MaterialIcon>{item.icon}</MaterialIcon>
@@ -150,7 +206,7 @@ export default function InsightsPage() {
               </span>
             </div>
             <ul className="recommendation-list">
-              {recommendations.map((item) => (
+              {displayedRecommendations.map((item) => (
                 <li key={item}>
                   <MaterialIcon>done</MaterialIcon>
                   <span>{item}</span>

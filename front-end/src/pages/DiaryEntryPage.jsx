@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import MaterialIcon from "../components/MaterialIcon.jsx";
 import MobileNav from "../components/MobileNav.jsx";
 import SideNav from "../components/SideNav.jsx";
+import { saveSleepRecord } from "../services/api.js";
 import { calculateSleepDuration } from "../utils/sleep.js";
 import { saveDiaryEntry } from "../utils/storage.js";
 
@@ -26,6 +27,11 @@ const initialDiaryState = {
 };
 
 const activityOptions = ["Baixo", "Medio", "Alto"];
+const activityApiValues = {
+  Baixo: "low",
+  Medio: "medium",
+  Alto: "high"
+};
 
 function getCurrentDateParts() {
   const today = new Date();
@@ -82,6 +88,7 @@ function parseBloodPressure(value) {
 export default function DiaryEntryPage() {
   const [formData, setFormData] = useState(initialDiaryState);
   const [saveMessage, setSaveMessage] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
   const dateParts = getCurrentDateParts();
   const calculatedDuration = useMemo(
     () => calculateSleepDuration(formData.sleepTime, formData.wakeTime),
@@ -122,7 +129,27 @@ export default function DiaryEntryPage() {
     }));
   };
 
-  const handleSave = () => {
+  const buildApiPayload = () => ({
+    date: new Date().toISOString().slice(0, 10),
+    sleepDuration: calculatedDuration?.totalMinutes || 0,
+    sleepQuality: Number(formData.sleepQuality),
+    stressLevel: Number(formData.stressLevel),
+    mentalFatigue: Number(formData.mentalFatigue),
+    physicalActivity: activityApiValues[formData.physicalActivity] || "medium",
+    steps: Number(formData.dailySteps) || 0,
+    heartRate: Number(formData.heartRate) || null,
+    bloodPressure: {
+      systolic: bloodPressureStatus.isValid && bloodPressureStatus.systolic ? Number(bloodPressureStatus.systolic) : null,
+      diastolic: bloodPressureStatus.isValid && bloodPressureStatus.diastolic ? Number(bloodPressureStatus.diastolic) : null
+    },
+    screenTime: Number(formData.screenTimeBeforeSleep) || 0,
+    caffeine: formData.habits.caffeine,
+    alcohol: formData.habits.alcohol
+  });
+
+  const handleSave = async () => {
+    setIsSaving(true);
+
     const entry = {
       id: Date.now(),
       createdAt: new Date().toISOString(),
@@ -157,7 +184,16 @@ export default function DiaryEntryPage() {
     };
 
     saveDiaryEntry(entry);
-    setSaveMessage("Registro salvo. Seus insights podem ser atualizados com esses novos dados.");
+
+    try {
+      await saveSleepRecord(buildApiPayload());
+      setSaveMessage("Registro salvo e enviado ao backend. Seus insights podem ser atualizados com esses novos dados.");
+    } catch (error) {
+      console.error("Erro ao enviar registro de sono para API:", error);
+      setSaveMessage("Registro salvo localmente. Quando o backend estiver disponivel, este envio podera ser integrado automaticamente.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -301,7 +337,9 @@ export default function DiaryEntryPage() {
             </span>
             <p>{saveMessage || "Ao salvar, nossa IA atualizara seus insights personalizados para a proxima noite."}</p>
           </div>
-          <button className="btn btn--primary btn--large" type="button" onClick={handleSave}>Salvar Registro</button>
+          <button className="btn btn--primary btn--large" type="button" onClick={handleSave} disabled={isSaving}>
+            {isSaving ? "Salvando..." : "Salvar Registro"}
+          </button>
         </footer>
       </main>
       <MobileNav active="diario" />

@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ActionCard, MetricCard } from "../components/Card.jsx";
 import MaterialIcon from "../components/MaterialIcon.jsx";
 import MobileNav from "../components/MobileNav.jsx";
 import ProfileSettingsModal from "../components/ProfileSettingsModal.jsx";
 import SideNav from "../components/SideNav.jsx";
 import TopBar from "../components/TopBar.jsx";
+import { getUserProfile } from "../services/api.js";
 import { calculateBmi, formatBmi, getBmiClassification } from "../utils/health.js";
 import { getStoredProfile, saveStoredProfile } from "../utils/storage.js";
 
@@ -15,6 +16,13 @@ const journeyImage =
 
 function parseBirthDate(birthDate) {
   if (!birthDate) return null;
+
+  const isoMatch = birthDate.trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (isoMatch) {
+    const [, yearValue, monthValue, dayValue] = isoMatch;
+    const date = new Date(Number(yearValue), Number(monthValue) - 1, Number(dayValue));
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
 
   const match = birthDate.trim().match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
   if (!match) return null;
@@ -67,6 +75,28 @@ export default function ProfilePage({ currentTheme = "light", onThemeChange }) {
     profileSettings.weight ? `${profileSettings.weight} kg` : null,
     profileSettings.height ? `${profileSettings.height} cm` : null
   ].filter(Boolean).join(" • ") || "Complete peso e altura";
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadProfile() {
+      try {
+        const userProfile = await getUserProfile();
+        if (isMounted && userProfile) {
+          const savedProfile = saveStoredProfile(userProfile);
+          setProfileSettings(savedProfile || userProfile);
+        }
+      } catch (error) {
+        console.error("Erro ao buscar perfil na API:", error);
+      }
+    }
+
+    loadProfile();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handleSettingsSave = (settings) => {
     const { theme, ...profileData } = settings;

@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MetricCard } from "../components/Card.jsx";
 import MaterialIcon from "../components/MaterialIcon.jsx";
 import MobileNav from "../components/MobileNav.jsx";
 import SideNav from "../components/SideNav.jsx";
 import SleepRecordModal from "../components/SleepRecordModal.jsx";
+import { getSleepHistory } from "../services/api.js";
+import { getStoredDiaryEntries } from "../utils/storage.js";
 
-const sleepRecords = [
+const fallbackSleepRecords = [
   {
     date: "24 de Outubro, 2024",
     weekday: "Quinta-feira",
@@ -82,8 +84,104 @@ const sleepRecords = [
 
 const filters = ["7 dias", "30 dias", "Este mes"];
 
+function formatDate(value) {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value || "Data nao informada";
+  }
+
+  return date.toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric"
+  });
+}
+
+function formatWeekday(value) {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  return date.toLocaleDateString("pt-BR", { weekday: "long" });
+}
+
+function formatDuration(minutes) {
+  const totalMinutes = Number(minutes);
+
+  if (!Number.isFinite(totalMinutes) || totalMinutes <= 0) {
+    return "Nao informado";
+  }
+
+  const hours = Math.floor(totalMinutes / 60);
+  const remainingMinutes = totalMinutes % 60;
+  return `${hours}h ${String(remainingMinutes).padStart(2, "0")}m`;
+}
+
+function formatQuality(value) {
+  const quality = Number(value);
+
+  if (!Number.isFinite(quality)) {
+    return value || "Nao informado";
+  }
+
+  if (quality >= 9) return "Excelente";
+  if (quality >= 7) return "Boa";
+  if (quality >= 5) return "Regular";
+  return "Baixa";
+}
+
+function mapApiRecord(record) {
+  const sleepScore = Number(record.sleepScore);
+
+  return {
+    ...record,
+    date: formatDate(record.date),
+    weekday: formatWeekday(record.date),
+    duration: record.duration || formatDuration(record.sleepDuration),
+    quality: record.quality || formatQuality(record.sleepQuality),
+    score: Number.isFinite(sleepScore) ? `${sleepScore}%` : record.score || "Nao informado",
+    sleepScore: Number.isFinite(sleepScore) ? String(sleepScore) : record.sleepScore,
+    goal: record.goal || (Number.isFinite(sleepScore) && sleepScore >= 75 ? "Meta atingida" : "Em acompanhamento"),
+    note: record.note || `Registro com qualidade ${record.sleepQuality}/10 e estresse ${record.stressLevel}/10.`,
+    tone: record.tone || (Number.isFinite(sleepScore) && sleepScore >= 80 ? "tertiary" : "secondary"),
+    stressLevel: record.stressLevel ? `${record.stressLevel}/10` : "Nao informado",
+    activityTime: record.physicalActivity || "Nao informado",
+    steps: record.steps || "Nao informado",
+    phoneBeforeSleep: record.screenTime ? record.screenTime > 0 : record.phoneBeforeSleep,
+    detectedDisturbance: record.disorder || record.detectedDisturbance || "Nao identificado"
+  };
+}
+
 export default function HistoryPage() {
   const [selectedRecord, setSelectedRecord] = useState(null);
+  const [records, setRecords] = useState(() => {
+    const storedEntries = getStoredDiaryEntries();
+    return storedEntries.length > 0 ? storedEntries : fallbackSleepRecords;
+  });
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadHistory() {
+      try {
+        const history = await getSleepHistory();
+        if (isMounted && Array.isArray(history)) {
+          setRecords(history.map(mapApiRecord));
+        }
+      } catch (error) {
+        console.error("Erro ao buscar historico na API:", error);
+      }
+    }
+
+    loadHistory();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handleOpenRecord = (record) => {
     setSelectedRecord(record);
@@ -116,7 +214,7 @@ export default function HistoryPage() {
           <MetricCard
             icon={<MaterialIcon>calendar_month</MaterialIcon>}
             label="Registros"
-            value="28"
+            value={String(records.length)}
             detail="Ultimos 30 dias"
             color="primary"
           />
@@ -148,10 +246,10 @@ export default function HistoryPage() {
           </div>
 
           <div className="history-list">
-            {sleepRecords.map((record) => (
+            {records.map((record) => (
               <article
                 className="history-record"
-                key={record.date}
+                key={record.id || record.createdAt || record.date}
                 role="button"
                 tabIndex={0}
                 onClick={() => handleOpenRecord(record)}

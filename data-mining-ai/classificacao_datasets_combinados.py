@@ -47,10 +47,15 @@ def prepare_sleep_dataset(df):
     })
 
     bp_split = df["blood_pressure"].str.split("/", expand=True)
+
     df["bp_systolic"] = pd.to_numeric(bp_split[0], errors="coerce")
     df["bp_diastolic"] = pd.to_numeric(bp_split[1], errors="coerce")
 
-    df = df.drop(columns=["blood_pressure"], errors="ignore")
+    df["bp_mean"] = (
+        df["bp_systolic"] + (2 * df["bp_diastolic"])
+    ) / 3
+
+    df = df.drop(columns=["blood_pressure", "bp_systolic", "bp_diastolic"], errors="ignore")
 
     df["sleep_duration_hours"] = df["sleep_duration"]
     df["physical_activity_minutes"] = df["physical_activity_level"]
@@ -71,8 +76,7 @@ def prepare_sleep_dataset(df):
         "bmi_category",
         "heart_rate",
         "daily_steps",
-        "bp_systolic",
-        "bp_diastolic",
+        "bp_mean",
         "used_phone_before_sleep",
         "consumed_caffeine",
         "consumed_alcohol",

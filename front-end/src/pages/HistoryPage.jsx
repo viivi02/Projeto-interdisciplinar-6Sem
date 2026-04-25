@@ -133,6 +133,14 @@ function formatQuality(value) {
   return "Baixa";
 }
 
+function formatBloodPressure(value) {
+  if (value === null || value === undefined || value === "") {
+    return "Nao informado";
+  }
+
+  return value;
+}
+
 function mapApiRecord(record) {
   const sleepScore = Number(record.sleepScore);
 
@@ -150,6 +158,7 @@ function mapApiRecord(record) {
     stressLevel: record.stressLevel ? `${record.stressLevel}/10` : "Nao informado",
     activityTime: record.physicalActivity || "Nao informado",
     steps: record.steps || "Nao informado",
+    bloodPressure: formatBloodPressure(record.bloodPressure),
     phoneBeforeSleep: record.screenTime ? record.screenTime > 0 : record.phoneBeforeSleep,
     detectedDisturbance: record.disorder || record.detectedDisturbance || "Nao identificado"
   };

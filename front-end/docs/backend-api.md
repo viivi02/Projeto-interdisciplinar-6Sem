@@ -29,10 +29,7 @@ Corpo:
   "physicalActivity": "medium",
   "steps": 7200,
   "heartRate": 72,
-  "bloodPressure": {
-    "systolic": 120,
-    "diastolic": 80
-  },
+  "bloodPressure": 120,
   "screenTime": 45,
   "caffeine": true,
   "alcohol": false
@@ -52,10 +49,7 @@ Resposta recomendada:
   "physicalActivity": "medium",
   "steps": 7200,
   "heartRate": 72,
-  "bloodPressure": {
-    "systolic": 120,
-    "diastolic": 80
-  },
+  "bloodPressure": 120,
   "screenTime": 45,
   "caffeine": true,
   "alcohol": false,
@@ -84,10 +78,7 @@ Resposta esperada:
     "physicalActivity": "medium",
     "steps": 7200,
     "heartRate": 72,
-    "bloodPressure": {
-      "systolic": 120,
-      "diastolic": 80
-    },
+    "bloodPressure": 120,
     "screenTime": 45,
     "caffeine": true,
     "alcohol": false,
@@ -162,4 +153,3 @@ Para apontar o frontend para a API real, crie um arquivo `.env` no frontend:
 ```env
 VITE_API_BASE_URL=http://localhost:8000
 ```
-

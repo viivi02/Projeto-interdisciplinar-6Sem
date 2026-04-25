@@ -21,7 +21,8 @@ const detailGroups = [
       { icon: "star", label: "Qualidade", key: "quality" },
       { icon: "mood", label: "Estresse", key: "stressLevel" },
       { icon: "directions_run", label: "Atividade", key: "activityTime" },
-      { icon: "directions_walk", label: "Passos", key: "steps" }
+      { icon: "directions_walk", label: "Passos", key: "steps" },
+      { icon: "favorite", label: "Pressao arterial", key: "bloodPressure" }
     ]
   },
   {

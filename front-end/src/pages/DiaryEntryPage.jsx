@@ -14,9 +14,7 @@ const initialDiaryState = {
   sleepQuality: 8,
   mentalFatigue: 4,
   heartRate: "",
-  bloodPressureRaw: "",
-  systolic: "",
-  diastolic: "",
+  bloodPressure: "",
   dailySteps: "",
   screenTimeBeforeSleep: "",
   habits: {
@@ -55,36 +53,6 @@ function getSleepQualityLabel(value) {
   return "Descanso profundo";
 }
 
-function parseBloodPressure(value) {
-  const normalizedValue = value.trim();
-
-  if (!normalizedValue) {
-    return {
-      systolic: "",
-      diastolic: "",
-      isValid: true
-    };
-  }
-
-  if (!/^\d+\/\d+$/.test(normalizedValue)) {
-    return {
-      systolic: "",
-      diastolic: "",
-      isValid: false
-    };
-  }
-
-  const [systolicRaw, diastolicRaw] = normalizedValue.split("/");
-  const systolic = Number(systolicRaw);
-  const diastolic = Number(diastolicRaw);
-
-  return {
-    systolic,
-    diastolic,
-    isValid: Number.isFinite(systolic) && Number.isFinite(diastolic)
-  };
-}
-
 export default function DiaryEntryPage() {
   const [formData, setFormData] = useState(initialDiaryState);
   const [saveMessage, setSaveMessage] = useState("");
@@ -94,23 +62,16 @@ export default function DiaryEntryPage() {
     () => calculateSleepDuration(formData.sleepTime, formData.wakeTime),
     [formData.sleepTime, formData.wakeTime]
   );
-  const bloodPressureStatus = useMemo(
-    () => parseBloodPressure(formData.bloodPressureRaw),
-    [formData.bloodPressureRaw]
-  );
 
   const handleFieldChange = (event) => {
     const { name, value } = event.target;
 
-    if (name === "bloodPressureRaw") {
-      if (!/^[\d/]*$/.test(value)) return;
+    if (name === "bloodPressure") {
+      if (!/^\d*$/.test(value)) return;
 
-      const parsedBloodPressure = parseBloodPressure(value);
       setFormData((currentData) => ({
         ...currentData,
-        bloodPressureRaw: value,
-        systolic: parsedBloodPressure.systolic,
-        diastolic: parsedBloodPressure.diastolic
+        bloodPressure: value === "" ? "" : Number(value)
       }));
       return;
     }
@@ -138,10 +99,7 @@ export default function DiaryEntryPage() {
     physicalActivity: activityApiValues[formData.physicalActivity] || "medium",
     steps: Number(formData.dailySteps) || 0,
     heartRate: Number(formData.heartRate) || null,
-    bloodPressure: {
-      systolic: bloodPressureStatus.isValid && bloodPressureStatus.systolic ? Number(bloodPressureStatus.systolic) : null,
-      diastolic: bloodPressureStatus.isValid && bloodPressureStatus.diastolic ? Number(bloodPressureStatus.diastolic) : null
-    },
+    bloodPressure: formData.bloodPressure === "" ? null : Number(formData.bloodPressure),
     screenTime: Number(formData.screenTimeBeforeSleep) || 0,
     caffeine: formData.habits.caffeine,
     alcohol: formData.habits.alcohol
@@ -163,10 +121,7 @@ export default function DiaryEntryPage() {
       quality: `${formData.sleepQuality}/10`,
       mentalFatigue: `${formData.mentalFatigue}/10`,
       heartRate: formData.heartRate ? `${formData.heartRate} bpm` : "",
-      bloodPressure: bloodPressureStatus.isValid ? formData.bloodPressureRaw : "",
-      bloodPressureRaw: formData.bloodPressureRaw,
-      systolic: bloodPressureStatus.isValid ? bloodPressureStatus.systolic : "",
-      diastolic: bloodPressureStatus.isValid ? bloodPressureStatus.diastolic : "",
+      bloodPressure: formData.bloodPressure === "" ? "" : Number(formData.bloodPressure),
       steps: formData.dailySteps,
       caffeine: formData.habits.caffeine,
       phoneBeforeSleep: formData.habits.screens,
@@ -307,17 +262,14 @@ export default function DiaryEntryPage() {
               </Field>
               <Field label="Pressao arterial">
                 <input
-                  type="text"
-                  name="bloodPressureRaw"
-                  value={formData.bloodPressureRaw}
+                  type="number"
+                  name="bloodPressure"
+                  value={formData.bloodPressure}
                   onChange={handleFieldChange}
-                  placeholder="120/80"
-                  inputMode="text"
-                  aria-invalid={!bloodPressureStatus.isValid}
+                  min="0"
+                  placeholder="120"
+                  inputMode="numeric"
                 />
-                {!bloodPressureStatus.isValid && (
-                  <span className="field-hint field-hint--warning">Use o formato 120/80.</span>
-                )}
               </Field>
               <Field label="Passos diarios">
                 <input type="number" name="dailySteps" value={formData.dailySteps} onChange={handleFieldChange} min="0" placeholder="7200" />

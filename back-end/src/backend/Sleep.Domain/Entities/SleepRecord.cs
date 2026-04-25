@@ -32,5 +32,11 @@ namespace Sleep.Domain.Entities
         public int HeartRate { get; set; } = 0;
         [Column("daily_steps")]
         public int DailySteps {  get; set; } = 0;
+        public bool Caffeine { get; set; } 
+        public bool Alcohol { get; set; }
+        [Column("screen_before_sleep")]
+        public bool ScreenBeforeSleep { get; set; }
+        [Column("mental_fatigue")]
+        public int MentalFigure { get; set; }
     }
 }

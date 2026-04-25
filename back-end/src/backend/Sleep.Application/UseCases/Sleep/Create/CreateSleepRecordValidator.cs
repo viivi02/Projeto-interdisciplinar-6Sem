@@ -18,6 +18,11 @@ namespace Sleep.Application.UseCases.Sleep.Create
             RuleFor(req => req.BloodPressure).NotEmpty().WithMessage(ResourceMessageException.BLOOD_PRESSURE_EMPTY);
             RuleFor(req => req.DailySteps).NotEmpty().WithMessage(ResourceMessageException.DAILY_STEPS_EMPTY);
             RuleFor(req => req.HeartRate).NotEmpty().WithMessage(ResourceMessageException.HEART_RATE_EMPTY);
+            RuleFor(req => req.MentalFatigue).InclusiveBetween(1, 10).WithMessage(ResourceMessageException.VALUE_BETWEEN_1_10);
+            RuleFor(req => req.Caffeine).NotNull().WithMessage(ResourceMessageException.CAFFEINE_NOT_NULL);
+            RuleFor(req => req.ScreenBeforeSleep).NotNull().WithMessage(ResourceMessageException.SCREEN_BEFORE_SLEEP_NULL);
+            RuleFor(req => req.Alcohol).NotNull().WithMessage(ResourceMessageException.ALCOHOL_NOT_NULL);
+
         }
     }
 }

@@ -177,4 +177,13 @@
   <data name="END_DATE_GREATER_THAN_START" xml:space="preserve">
     <value>A data fim não pode ser maior que a data começo.</value>
   </data>
+  <data name="SCREEN_BEFORE_SLEEP_NULL" xml:space="preserve">
+    <value>A tela antes de dormir não pode ser nula.</value>
+  </data>
+  <data name="ALCOHOL_NOT_NULL" xml:space="preserve">
+    <value>O campo de álcool antes de dormir não pode ser vazio.</value>
+  </data>
+  <data name="CAFFEINE_NOT_NULL" xml:space="preserve">
+    <value>O campo de cafeína não pode vaizo.</value>
+  </data>
 </root>

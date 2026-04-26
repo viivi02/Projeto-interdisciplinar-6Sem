@@ -219,3 +219,11 @@ A combinação de dados fisiológicos e comportamentais permitiu criar um sistem
 - Scikit-learn
 - XGBoost
 - Jupyter Notebook
+
+---
+
+# 14. Scripts pre_processamento e treinamento 
+
+- [Script antigo do modelo de classificação](https://github.com/viivi02/Projeto-interdisciplinar-6Sem/blob/8f9251de4bf8765cf83c4f5991ba9dbf5b1ff759/data-mining-ai/pre_processamento.py)
+- [Script do modelo de classificação com datasets combinados](https://github.com/viivi02/Projeto-interdisciplinar-6Sem/blob/8f9251de4bf8765cf83c4f5991ba9dbf5b1ff759/data-mining-ai/classificacao_datasets_combinados.py)
+- [Script do modelo de regressão](https://github.com/viivi02/Projeto-interdisciplinar-6Sem/blob/8f9251de4bf8765cf83c4f5991ba9dbf5b1ff759/data-mining-ai/regressao_score_sono.py)

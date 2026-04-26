@@ -207,8 +207,7 @@ A escolha de separar os problemas em duas abordagens distintas mostrou-se eficie
 # 12. Conclusão
 
 O projeto demonstrou que técnicas de Machine Learning podem ser aplicadas com sucesso na análise de padrões de sono.
-
-A combinação de dados fisiológicos e comportamentais permitiu criar um sistema capaz de fornecer informações relevantes ao usuário, contribuindo para a melhoria da qualidade de vida.
+A combinação de datasets foi utilizada para aumentar a capacidade de generalização do modelo de classificação, compensando o tamanho reduzido do dataset principal. Para evitar viés, a regressão foi treinada separadamente utilizando apenas dados consistentes. Efetuando a combinação de dados fisiológicos e comportamentais permitiu criar um sistema capaz de fornecer informações relevantes ao usuário, contribuindo para a melhoria da qualidade de vida.
 
 ---
 

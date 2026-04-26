@@ -12,8 +12,8 @@ DATASET_SLEEP_PATH = "Sleep_health_and_lifestyle_dataset.csv"
 DATASET_MOBILE_PATH = "sleep_mobile_stress_dataset_15000.csv"
 
 RF_MODEL_PATH = "rf_combined_sleep_model.pkl"
-XGB_MODEL_PATH = "xgb_combined_sleep_model.pkl"
-LABEL_ENCODER_PATH = "label_encoder_combined.pkl"
+"""XGB_MODEL_PATH = "xgb_combined_sleep_model.pkl"""
+"""LABEL_ENCODER_PATH = "label_encoder_combined.pkl"""
 
 MAX_MOBILE_ROWS = 500
 
@@ -125,8 +125,7 @@ def prepare_mobile_dataset(df):
     df["bmi_category"] = "Unknown"
     df["heart_rate"] = pd.NA
     df["daily_steps"] = pd.NA
-    df["bp_systolic"] = pd.NA
-    df["bp_diastolic"] = pd.NA
+    df["bp_mean"] = pd.NA
 
     df["sleep_disorder"] = df.apply(create_pseudo_label, axis=1)
 
@@ -141,8 +140,7 @@ def prepare_mobile_dataset(df):
         "bmi_category",
         "heart_rate",
         "daily_steps",
-        "bp_systolic",
-        "bp_diastolic",
+        "bp_mean",
         "used_phone_before_sleep",
         "consumed_caffeine",
         "consumed_alcohol",
@@ -170,8 +168,7 @@ def preprocess_combined_data(df):
         "physical_activity_minutes",
         "heart_rate",
         "daily_steps",
-        "bp_systolic",
-        "bp_diastolic",
+        "bp_mean",
         "used_phone_before_sleep",
         "consumed_caffeine",
         "consumed_alcohol",

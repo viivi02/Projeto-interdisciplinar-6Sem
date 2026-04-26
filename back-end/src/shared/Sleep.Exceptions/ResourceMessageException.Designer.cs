@@ -61,6 +61,15 @@ namespace Sleep.Exceptions {
         }
         
         /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a The alcohol field can&apos;t be null..
+        /// </summary>
+        public static string ALCOHOL_NOT_NULL {
+            get {
+                return ResourceManager.GetString("ALCOHOL_NOT_NULL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Consulta uma cadeia de caracteres localizada semelhante a The blood pressure cant be empty..
         /// </summary>
         public static string BLOOD_PRESSURE_EMPTY {
@@ -75,6 +84,15 @@ namespace Sleep.Exceptions {
         public static string BMI_INVALID {
             get {
                 return ResourceManager.GetString("BMI_INVALID", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a The caffeine field can&apos;t be null..
+        /// </summary>
+        public static string CAFFEINE_NOT_NULL {
+            get {
+                return ResourceManager.GetString("CAFFEINE_NOT_NULL", resourceCulture);
             }
         }
         
@@ -201,6 +219,15 @@ namespace Sleep.Exceptions {
         public static string RECORD_DATE_NULL {
             get {
                 return ResourceManager.GetString("RECORD_DATE_NULL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a The screen before sleep can&apos;t be null..
+        /// </summary>
+        public static string SCREEN_BEFORE_SLEEP_NULL {
+            get {
+                return ResourceManager.GetString("SCREEN_BEFORE_SLEEP_NULL", resourceCulture);
             }
         }
         

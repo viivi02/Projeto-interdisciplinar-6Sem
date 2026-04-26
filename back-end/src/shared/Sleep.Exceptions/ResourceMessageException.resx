@@ -177,4 +177,13 @@
   <data name="END_DATE_GREATER_THAN_START" xml:space="preserve">
     <value>The end date can't be greater than start date.</value>
   </data>
+  <data name="SCREEN_BEFORE_SLEEP_NULL" xml:space="preserve">
+    <value>The screen before sleep can't be null.</value>
+  </data>
+  <data name="ALCOHOL_NOT_NULL" xml:space="preserve">
+    <value>The alcohol field can't be null.</value>
+  </data>
+  <data name="CAFFEINE_NOT_NULL" xml:space="preserve">
+    <value>The caffeine field can't be null.</value>
+  </data>
 </root>

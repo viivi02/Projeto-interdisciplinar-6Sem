@@ -14,5 +14,9 @@ namespace Sleep.Communication.Requests.Sleep
         public string? Notes { get; set; }
         public int HeartRate { get; set; }
         public int DailySteps { get; set; }
+        public bool ScreenBeforeSleep { get; set; }
+        public bool Caffeine { get; set; }
+        public bool Alcohol { get; set; } 
+        public int MentalFatigue {  get; set; }
     }
 }

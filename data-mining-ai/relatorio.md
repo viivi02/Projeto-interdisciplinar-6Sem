@@ -77,6 +77,7 @@ Os nomes das colunas foram normalizados para facilitar o processamento:
 
 ```python
 df.columns = df.columns.str.lower().str.replace(" ", "_")
+```
 
 ## 5.2 Tratamento de Valores Ausentes
 

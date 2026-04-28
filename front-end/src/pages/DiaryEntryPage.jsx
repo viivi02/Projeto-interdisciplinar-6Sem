@@ -90,20 +90,34 @@ export default function DiaryEntryPage() {
     }));
   };
 
-  const buildApiPayload = () => ({
-    date: new Date().toISOString().slice(0, 10),
-    sleepDuration: calculatedDuration?.totalMinutes || 0,
-    sleepQuality: Number(formData.sleepQuality),
-    stressLevel: Number(formData.stressLevel),
-    mentalFatigue: Number(formData.mentalFatigue),
-    physicalActivity: activityApiValues[formData.physicalActivity] || "medium",
-    steps: Number(formData.dailySteps) || 0,
-    heartRate: Number(formData.heartRate) || null,
-    bloodPressure: formData.bloodPressure === "" ? null : Number(formData.bloodPressure),
-    screenTime: Number(formData.screenTimeBeforeSleep) || 0,
-    caffeine: formData.habits.caffeine,
-    alcohol: formData.habits.alcohol
-  });
+  const buildApiPayload = () => {
+    const now = new Date();
+    const [wakeH, wakeM] = formData.wakeTime.split(':').map(Number);
+    const [sleepH, sleepM] = formData.sleepTime.split(':').map(Number);
+    
+    let sleepDate = new Date(now);
+    sleepDate.setHours(sleepH, sleepM, 0, 0);
+    
+    let wakeDate = new Date(now);
+    wakeDate.setHours(wakeH, wakeM, 0, 0);
+
+    if (sleepDate > wakeDate) {
+      sleepDate.setDate(sleepDate.getDate() - 1);
+    }
+
+    return {
+      sleepStart: sleepDate.toISOString().slice(0, 19),
+      sleepEnd: wakeDate.toISOString().slice(0, 19),
+      qualityOfSleep: Number(formData.sleepQuality),
+      stressLevel: Number(formData.stressLevel),
+      physicalActivityMinutes: formData.physicalActivity === "Alto" ? 60 : formData.physicalActivity === "Medio" ? 30 : 0,
+      bmiCategory: 1,
+      bloodPressure: formData.bloodPressure === "" ? 120 : Number(formData.bloodPressure),
+      notes: `Atividade ${formData.physicalActivity} com qualidade ${formData.sleepQuality}/10 e estresse ${formData.stressLevel}/10.`,
+      heartRate: formData.heartRate === "" ? 72 : Number(formData.heartRate),
+      dailySteps: formData.dailySteps === "" ? 5000 : Number(formData.dailySteps)
+    };
+  };
 
   const handleSave = async () => {
     setIsSaving(true);

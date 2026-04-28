@@ -21,10 +21,10 @@ export default function LoginPage() {
     setFormData((currentData) => ({ ...currentData, [name]: value }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const result = loginUser(formData.email, formData.password);
+    const result = await loginUser(formData.email, formData.password);
 
     if (!result.success) {
       setErrorMessage(result.message);

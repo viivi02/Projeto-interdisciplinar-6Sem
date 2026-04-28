@@ -146,9 +146,9 @@ function mapApiRecord(record) {
 
   return {
     ...record,
-    date: formatDate(record.date),
-    weekday: formatWeekday(record.date),
-    duration: record.duration || formatDuration(record.sleepDuration),
+    date: formatDate(record.recordDate || record.date),
+    weekday: formatWeekday(record.recordDate || record.date),
+    duration: record.duration || (record.durationInHours ? `${record.durationInHours}h` : formatDuration(record.sleepDuration)),
     quality: record.quality || formatQuality(record.sleepQuality),
     score: Number.isFinite(sleepScore) ? `${sleepScore}%` : record.score || "Nao informado",
     sleepScore: Number.isFinite(sleepScore) ? String(sleepScore) : record.sleepScore,
@@ -176,7 +176,8 @@ export default function HistoryPage() {
 
     async function loadHistory() {
       try {
-        const history = await getSleepHistory();
+        const response = await getSleepHistory();
+        const history = response?.items || response || [];
         if (isMounted && Array.isArray(history)) {
           setRecords(history.map(mapApiRecord));
         }

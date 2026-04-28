@@ -10,7 +10,7 @@ const initialFormData = {
   email: "",
   password: "",
   birthDate: "",
-  gender: "Prefiro nao informar",
+  gender: "",
   profession: "",
   sleepGoal: "",
   weight: "",
@@ -26,10 +26,10 @@ export default function RegisterPage() {
     setFormData((currentData) => ({ ...currentData, [name]: value }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const result = registerUser({
+    const result = await registerUser({
       ...formData,
       birthDate: formatBirthDate(formData.birthDate)
     });
@@ -87,10 +87,9 @@ export default function RegisterPage() {
           <Field id="password" name="password" label="Senha" placeholder="........" type="password" icon="visibility" value={formData.password} onChange={handleChange} />
           <Field id="birthDate" name="birthDate" label="Data de nascimento" placeholder="DDMMAAAA ou DD/MM/AAAA" value={formData.birthDate} onChange={handleChange} />
           <SelectField id="gender" name="gender" label="Genero" value={formData.gender} onChange={handleChange}>
-            <option value="Feminino">Feminino</option>
-            <option value="Masculino">Masculino</option>
-            <option value="Outro">Outro</option>
-            <option value="Prefiro nao informar">Prefiro nao informar</option>
+            <option value="" disabled>Selecione seu genero</option>
+            <option value="F">Feminino</option>
+            <option value="M">Masculino</option>
           </SelectField>
           <Field id="profession" name="profession" label="Cargo profissional" placeholder="Ex.: Analista de Produto" value={formData.profession} onChange={handleChange} />
           <Field id="sleepGoal" name="sleepGoal" label="Meta de sono" placeholder="Ex.: 8h 00m" value={formData.sleepGoal} onChange={handleChange} />

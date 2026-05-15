@@ -4,5 +4,6 @@
     {
         public DateOnly RecordDate { get; set; }
         public int DurationInHours { get; set; }
+        public long SleepRecordId { get; set; }
     }
 }

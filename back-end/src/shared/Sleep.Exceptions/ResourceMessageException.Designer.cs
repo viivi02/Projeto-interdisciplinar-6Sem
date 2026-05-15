@@ -70,6 +70,15 @@ namespace Sleep.Exceptions {
         }
         
         /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a Already exists analysis for this record..
+        /// </summary>
+        public static string ALREADY_EXISTS_ANALYSIS {
+            get {
+                return ResourceManager.GetString("ALREADY_EXISTS_ANALYSIS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Consulta uma cadeia de caracteres localizada semelhante a The blood pressure cant be empty..
         /// </summary>
         public static string BLOOD_PRESSURE_EMPTY {
@@ -174,6 +183,15 @@ namespace Sleep.Exceptions {
         public static string NAME_EMPTY {
             get {
                 return ResourceManager.GetString("NAME_EMPTY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a The value was not found. .
+        /// </summary>
+        public static string NOT_FOUND_EXCEPTION {
+            get {
+                return ResourceManager.GetString("NOT_FOUND_EXCEPTION", resourceCulture);
             }
         }
         

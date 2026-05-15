@@ -4,172 +4,26 @@ import MaterialIcon from "../components/MaterialIcon.jsx";
 import MobileNav from "../components/MobileNav.jsx";
 import SideNav from "../components/SideNav.jsx";
 import SleepRecordModal from "../components/SleepRecordModal.jsx";
-import { getSleepHistory } from "../services/api.js";
+import { getSleepAnalysisByRecordId, getSleepHistory, getSleepRecordById } from "../services/api.js";
+import { calculateAverageDurationHours, calculateGoalCount } from "../utils/sleepAnalytics.js";
+import { formatDurationFromHours } from "../utils/sleepFormatting.js";
+import { mapSleepHistoryRecord, mapSleepRecordDetails } from "../utils/sleepMappers.js";
 import { getStoredDiaryEntries } from "../utils/storage.js";
-
-const fallbackSleepRecords = [
-  {
-    date: "24 de Outubro, 2024",
-    weekday: "Quinta-feira",
-    duration: "7h 42m",
-    quality: "Otima",
-    score: "85%",
-    sleepScore: "85",
-    goal: "Meta atingida",
-    note: "Sono continuo, com apenas um despertar breve durante a madrugada.",
-    tone: "tertiary",
-    stressLevel: "3/10",
-    activityTime: "58 min",
-    steps: "7420",
-    phoneBeforeSleep: false,
-    caffeine: false,
-    alcohol: false,
-    detectedDisturbance: "Nao identificado"
-  },
-  {
-    date: "23 de Outubro, 2024",
-    weekday: "Quarta-feira",
-    duration: "7h 18m",
-    quality: "Boa",
-    score: "79%",
-    sleepScore: "79",
-    goal: "Perto da meta",
-    note: "Descanso adequado, mas o horario de dormir atrasou um pouco.",
-    tone: "secondary",
-    stressLevel: "5/10",
-    activityTime: "40 min",
-    steps: "6800",
-    phoneBeforeSleep: true,
-    caffeine: true,
-    alcohol: false,
-    detectedDisturbance: "Insonia (leve)"
-  },
-  {
-    date: "22 de Outubro, 2024",
-    weekday: "Terca-feira",
-    duration: "8h 05m",
-    quality: "Excelente",
-    score: "91%",
-    sleepScore: "91",
-    goal: "Meta atingida",
-    note: "Noite mais regular da semana, com boa sensacao de energia pela manha.",
-    tone: "primary",
-    stressLevel: "2/10",
-    activityTime: "72 min",
-    steps: "9540",
-    phoneBeforeSleep: false,
-    caffeine: false,
-    alcohol: false,
-    detectedDisturbance: "Nao identificado"
-  },
-  {
-    date: "21 de Outubro, 2024",
-    weekday: "Segunda-feira",
-    duration: "6h 48m",
-    quality: "Regular",
-    score: "68%",
-    sleepScore: "68",
-    goal: "Abaixo da meta",
-    note: "Tempo total menor que o planejado; vale observar cafeina e estresse.",
-    tone: "secondary",
-    stressLevel: "7/10",
-    activityTime: "25 min",
-    steps: "4890",
-    phoneBeforeSleep: true,
-    caffeine: true,
-    alcohol: null,
-    detectedDisturbance: "Sono fragmentado"
-  }
-];
 
 const filters = ["7 dias", "30 dias", "Este mes"];
 
-function formatDate(value) {
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return value || "Data nao informada";
-  }
-
-  return date.toLocaleDateString("pt-BR", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric"
-  });
-}
-
-function formatWeekday(value) {
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return "";
-  }
-
-  return date.toLocaleDateString("pt-BR", { weekday: "long" });
-}
-
-function formatDuration(minutes) {
-  const totalMinutes = Number(minutes);
-
-  if (!Number.isFinite(totalMinutes) || totalMinutes <= 0) {
-    return "Nao informado";
-  }
-
-  const hours = Math.floor(totalMinutes / 60);
-  const remainingMinutes = totalMinutes % 60;
-  return `${hours}h ${String(remainingMinutes).padStart(2, "0")}m`;
-}
-
-function formatQuality(value) {
-  const quality = Number(value);
-
-  if (!Number.isFinite(quality)) {
-    return value || "Nao informado";
-  }
-
-  if (quality >= 9) return "Excelente";
-  if (quality >= 7) return "Boa";
-  if (quality >= 5) return "Regular";
-  return "Baixa";
-}
-
-function formatBloodPressure(value) {
-  if (value === null || value === undefined || value === "") {
-    return "Nao informado";
-  }
-
-  return value;
-}
-
-function mapApiRecord(record) {
-  const sleepScore = Number(record.sleepScore);
-
-  return {
-    ...record,
-    date: formatDate(record.recordDate || record.date),
-    weekday: formatWeekday(record.recordDate || record.date),
-    duration: record.duration || (record.durationInHours ? `${record.durationInHours}h` : formatDuration(record.sleepDuration)),
-    quality: record.quality || formatQuality(record.sleepQuality),
-    score: Number.isFinite(sleepScore) ? `${sleepScore}%` : record.score || "Nao informado",
-    sleepScore: Number.isFinite(sleepScore) ? String(sleepScore) : record.sleepScore,
-    goal: record.goal || (Number.isFinite(sleepScore) && sleepScore >= 75 ? "Meta atingida" : "Em acompanhamento"),
-    note: record.note || `Registro com qualidade ${record.sleepQuality}/10 e estresse ${record.stressLevel}/10.`,
-    tone: record.tone || (Number.isFinite(sleepScore) && sleepScore >= 80 ? "tertiary" : "secondary"),
-    stressLevel: record.stressLevel ? `${record.stressLevel}/10` : "Nao informado",
-    activityTime: record.physicalActivity || "Nao informado",
-    steps: record.steps || "Nao informado",
-    bloodPressure: formatBloodPressure(record.bloodPressure),
-    phoneBeforeSleep: record.screenTime ? record.screenTime > 0 : record.phoneBeforeSleep,
-    detectedDisturbance: record.disorder || record.detectedDisturbance || "Nao identificado"
-  };
-}
-
 export default function HistoryPage() {
   const [selectedRecord, setSelectedRecord] = useState(null);
+  const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const [records, setRecords] = useState(() => {
     const storedEntries = getStoredDiaryEntries();
-    return storedEntries.length > 0 ? storedEntries : fallbackSleepRecords;
+    return storedEntries.length > 0 ? storedEntries : [];
   });
+  const averageDurationHours = calculateAverageDurationHours(records);
+  const averageDurationText = Number.isFinite(averageDurationHours)
+    ? formatDurationFromHours(averageDurationHours)
+    : "Nao informado";
+  const goalCount = calculateGoalCount(records, 7);
 
   useEffect(() => {
     let isMounted = true;
@@ -179,7 +33,7 @@ export default function HistoryPage() {
         const response = await getSleepHistory();
         const history = response?.items || response || [];
         if (isMounted && Array.isArray(history)) {
-          setRecords(history.map(mapApiRecord));
+          setRecords(history.map(mapSleepHistoryRecord));
         }
       } catch (error) {
         console.error("Erro ao buscar historico na API:", error);
@@ -193,8 +47,28 @@ export default function HistoryPage() {
     };
   }, []);
 
-  const handleOpenRecord = (record) => {
+  const handleOpenRecord = async (record) => {
     setSelectedRecord(record);
+    const recordId = record.sleepRecordId || record.id;
+    if (!recordId) {
+      return;
+    }
+
+    setIsLoadingDetails(true);
+    try {
+      const [detailRecord, analysisRecord] = await Promise.all([
+        getSleepRecordById(recordId).catch(() => null),
+        getSleepAnalysisByRecordId(recordId).catch(() => null)
+      ]);
+
+      if (!detailRecord && !analysisRecord) {
+        return;
+      }
+
+      setSelectedRecord((currentRecord) => mapSleepRecordDetails(currentRecord || record, detailRecord, analysisRecord));
+    } finally {
+      setIsLoadingDetails(false);
+    }
   };
 
   const handleCloseRecord = () => {
@@ -231,14 +105,14 @@ export default function HistoryPage() {
           <MetricCard
             icon={<MaterialIcon>bedtime</MaterialIcon>}
             label="Media recente"
-            value="7h 32m"
+            value={averageDurationText}
             detail="Sono por noite"
             color="secondary"
           />
           <MetricCard
             icon={<MaterialIcon>flag</MaterialIcon>}
             label="Metas"
-            value="21"
+            value={records.length > 0 ? String(goalCount) : "Nao informado"}
             detail="Noites dentro da meta"
             color="tertiary"
           />
@@ -296,15 +170,20 @@ export default function HistoryPage() {
             </span>
             <div>
               <h3>Semana atual</h3>
-              <p>Media de 7h36 por noite, com qualidade geral boa e tres dias de destaque.</p>
+              <p>
+                {records.length > 0
+                  ? `Media de ${averageDurationText} por noite considerando os registros carregados.`
+                  : "Sem dados suficientes para resumir a semana atual."}
+              </p>
             </div>
           </div>
-          <button className="btn btn--soft" type="button">Ver semana completa</button>
+          <button className="btn btn--soft" type="button" disabled={records.length === 0}>Ver semana completa</button>
         </section>
       </main>
       <SleepRecordModal
         isOpen={selectedRecord !== null}
         record={selectedRecord}
+        isLoading={isLoadingDetails}
         onClose={handleCloseRecord}
       />
       <MobileNav active="historico" />

@@ -21,5 +21,7 @@ namespace Sleep.Domain.Entities
         public string Occupation { get; set; } = string.Empty;
         [Column("sleep_disorder")]
         public SleepDisorder SleepDisorder { get; set; }
+        [Column("sleep_goal")]
+        public string SleepGoal { get; set; } = string.Empty;
     }
 }

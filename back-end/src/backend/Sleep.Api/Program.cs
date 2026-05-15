@@ -1,4 +1,5 @@
 using Microsoft.OpenApi.Models;
+using Sleep.Api.BackgroundServices;
 using Sleep.Api.Filters;
 using Sleep.Api.Middlewares;
 using Sleep.Api.Token;
@@ -50,10 +51,23 @@ builder.Services.AddSwaggerGen(opt =>
     });
 });
 
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("front-end",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:5173") 
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
+
 builder.Services.AddMvc(options => options.Filters.Add(typeof(ExceptionFilter)));
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddInfrasctructure(builder.Configuration);
+builder.Services.AddHostedService<MessageConsumerService>();
 builder.Services.AddScoped<ITokenProvider, HttpContextTokenValue>();
 builder.Services.AddApplication(builder.Configuration);
 builder.Services.AddRouting(opt => opt.LowercaseUrls = true);
@@ -65,6 +79,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("front-end");
 app.UseMiddleware<CultureMiddleware>();
 app.UseHttpsRedirection();
 

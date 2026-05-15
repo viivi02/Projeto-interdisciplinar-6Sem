@@ -3,60 +3,14 @@ import { MetricCard } from "../components/Card.jsx";
 import MaterialIcon from "../components/MaterialIcon.jsx";
 import MobileNav from "../components/MobileNav.jsx";
 import SideNav from "../components/SideNav.jsx";
-import { getInsights } from "../services/api.js";
-
-const trendBars = [
-  ["SEG", 68],
-  ["TER", 74],
-  ["QUA", 82],
-  ["QUI", 78],
-  ["SEX", 86, true],
-  ["SAB", 70],
-  ["DOM", 73]
-];
-
-const quickInsights = [
-  {
-    icon: "check_circle",
-    title: "Meta quase consolidada",
-    text: "Voce atingiu pelo menos 7h30 de sono em 5 das ultimas 7 noites.",
-    tone: "tertiary"
-  },
-  {
-    icon: "schedule",
-    title: "Horario mais estavel",
-    text: "Seu padrao recente ficou mais consistente quando o descanso comecou antes das 23h.",
-    tone: "primary"
-  },
-  {
-    icon: "self_improvement",
-    title: "Descanso em bom nivel",
-    text: "A media da semana indica recuperacao adequada, com margem para melhorar a regularidade.",
-    tone: "secondary"
-  }
-];
-
-const recommendations = [
-  "Manter o horario de dormir entre 22h30 e 23h nos proximos dias.",
-  "Evitar telas fortes nos 30 minutos antes de deitar.",
-  "Registrar cafeina e estresse no diario para refinar os proximos insights."
-];
-
-function formatAverageSleep(hoursValue) {
-  const hoursNumber = Number(hoursValue);
-
-  if (!Number.isFinite(hoursNumber)) {
-    return "7h 36m";
-  }
-
-  const hours = Math.floor(hoursNumber);
-  const minutes = Math.round((hoursNumber - hours) * 60);
-  return `${hours}h ${String(minutes).padStart(2, "0")}m`;
-}
+import WeeklyBarChart from "../components/WeeklyBarChart.jsx";
+import { getInsights, getSleepHistory } from "../services/api.js";
+import { buildWeeklyBars, calculateGoalCount } from "../utils/sleepAnalytics.js";
+import { formatDurationFromHours } from "../utils/sleepFormatting.js";
 
 function buildQuickInsights(patterns) {
   if (!Array.isArray(patterns) || patterns.length === 0) {
-    return quickInsights;
+    return [];
   }
 
   return patterns.map((pattern, index) => ({
@@ -69,12 +23,18 @@ function buildQuickInsights(patterns) {
 
 export default function InsightsPage() {
   const [insights, setInsights] = useState(null);
-  const displayedRecommendations = insights?.recommendations || recommendations;
+  const [historyRecords, setHistoryRecords] = useState([]);
+  const displayedRecommendations = Array.isArray(insights?.recommendations) ? insights.recommendations : [];
   const displayedQuickInsights = buildQuickInsights(insights?.patterns);
-  const averageSleep = formatAverageSleep(insights?.averageSleep);
+  const trendBars = buildWeeklyBars(historyRecords);
+  const averageSleep = formatDurationFromHours(insights?.averageSleep);
   const averageScore = Number.isFinite(Number(insights?.averageScore))
     ? `${Math.round(Number(insights.averageScore))}%`
-    : "84%";
+    : "Nao informado";
+  const nightsInGoal = calculateGoalCount(historyRecords, 7);
+  const restLevel = Number.isFinite(Number(insights?.averageScore))
+    ? (Number(insights.averageScore) >= 80 ? "Alto" : Number(insights.averageScore) >= 60 ? "Moderado" : "Baixo")
+    : "Nao informado";
 
   useEffect(() => {
     let isMounted = true;
@@ -84,6 +44,11 @@ export default function InsightsPage() {
         const data = await getInsights();
         if (isMounted) {
           setInsights(data);
+        }
+
+        const history = await getSleepHistory(1, 50);
+        if (isMounted) {
+          setHistoryRecords(Array.isArray(history?.items) ? history.items : []);
         }
       } catch (error) {
         console.error("Erro ao buscar insights na API:", error);
@@ -117,10 +82,11 @@ export default function InsightsPage() {
           <section className="card insight-summary">
             <MaterialIcon className="insight-summary__ghost">nights_stay</MaterialIcon>
             <span className="kicker">Resumo geral</span>
-            <h3>Seu sono esta em boa evolucao</h3>
+            <h3>{historyRecords.length > 0 ? "Resumo baseado nos registros recebidos" : "Sem dados suficientes"}</h3>
             <p>
-              Nos ultimos registros, sua qualidade ficou acima da media pessoal. A regularidade do horario ainda e o
-              ponto com maior potencial de melhora.
+              {historyRecords.length > 0
+                ? "Os indicadores abaixo usam exclusivamente os dados reais retornados pelo backend."
+                : "Quando houver mais registros no backend, esta tela exibira os insights automaticamente."}
             </p>
             <div className="insight-summary__score">
               <strong>{averageScore}</strong>
@@ -133,21 +99,21 @@ export default function InsightsPage() {
               icon={<MaterialIcon>bedtime</MaterialIcon>}
               label="Sono medio"
               value={averageSleep}
-              detail="+18m vs semana anterior"
+              detail="Media calculada pelos registros recebidos"
               color="primary"
             />
             <MetricCard
               icon={<MaterialIcon>flag</MaterialIcon>}
               label="Meta atingida"
-              value="5/7"
+              value={historyRecords.length > 0 ? `${nightsInGoal}/${historyRecords.length}` : "Nao informado"}
               detail="Noites dentro da meta"
               color="tertiary"
             />
             <MetricCard
               icon={<MaterialIcon>bolt</MaterialIcon>}
               label="Nivel de descanso"
-              value="Bom"
-              detail="Energia estavel pela manha"
+              value={restLevel}
+              detail="Classificado pela pontuacao media"
               color="secondary"
             />
           </section>
@@ -158,16 +124,9 @@ export default function InsightsPage() {
                 <h3>Evolucao semanal</h3>
                 <p>Tendencia de qualidade dos ultimos 7 registros</p>
               </div>
-              <span className="badge">+6% esta semana</span>
+              <span className="badge">{historyRecords.length > 0 ? `${historyRecords.length} registros` : "Sem dados"}</span>
             </div>
-            <div className="bar-chart bar-chart--compact">
-              {trendBars.map(([day, height, active]) => (
-                <div className={active ? "bar-chart__item active" : "bar-chart__item"} key={day}>
-                  <span style={{ height: `${height}%` }} />
-                  <strong>{day}</strong>
-                </div>
-              ))}
-            </div>
+            <WeeklyBarChart bars={trendBars} compact />
           </section>
 
           <section className="card insight-panel">
@@ -181,7 +140,7 @@ export default function InsightsPage() {
               </span>
             </div>
             <div className="insight-list">
-              {displayedQuickInsights.map((item) => (
+              {displayedQuickInsights.length > 0 ? displayedQuickInsights.map((item) => (
                 <article className="insight-list__item" key={item.title}>
                   <span className={`round-icon round-icon--${item.tone}`}>
                     <MaterialIcon>{item.icon}</MaterialIcon>
@@ -191,7 +150,7 @@ export default function InsightsPage() {
                     <p>{item.text}</p>
                   </div>
                 </article>
-              ))}
+              )) : <p>Nenhum padrao disponivel no momento.</p>}
             </div>
           </section>
 
@@ -206,12 +165,12 @@ export default function InsightsPage() {
               </span>
             </div>
             <ul className="recommendation-list">
-              {displayedRecommendations.map((item) => (
+              {displayedRecommendations.length > 0 ? displayedRecommendations.map((item) => (
                 <li key={item}>
                   <MaterialIcon>done</MaterialIcon>
                   <span>{item}</span>
                 </li>
-              ))}
+              )) : <li><span>Sem recomendacoes disponiveis no momento.</span></li>}
             </ul>
           </section>
 

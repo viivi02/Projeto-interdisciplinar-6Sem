@@ -3,6 +3,10 @@ import { MetricCard } from "../components/Card.jsx";
 import MaterialIcon from "../components/MaterialIcon.jsx";
 import MobileNav from "../components/MobileNav.jsx";
 import SideNav from "../components/SideNav.jsx";
+import { getInsights, getSleepHistory } from "../services/api.js";
+import WeeklyBarChart from "../components/WeeklyBarChart.jsx";
+import { buildWeeklyBars } from "../utils/sleepAnalytics.js";
+import { formatDurationFromHours } from "../utils/sleepFormatting.js";
 import { getCurrentUser } from "../utils/auth.js";
 
 const bedroomImage =
@@ -34,17 +38,15 @@ function getFormattedCurrentDate(date = new Date()) {
 export default function DashboardPage() {
   const currentUser = getCurrentUser();
   const [currentDate, setCurrentDate] = useState(() => new Date());
+  const [historyRecords, setHistoryRecords] = useState([]);
+  const [insights, setInsights] = useState(null);
   const greeting = getGreetingByHour(currentDate);
   const formattedCurrentDate = getFormattedCurrentDate(currentDate);
-  const bars = [
-    ["SEG", 60],
-    ["TER", 85],
-    ["QUA", 100, true],
-    ["QUI", 75],
-    ["SEX", 80],
-    ["SAB", 40],
-    ["DOM", 35]
-  ];
+  const bars = buildWeeklyBars(historyRecords);
+  const latestRecord = historyRecords[0] || null;
+  const averageScoreNumber = Number(insights?.averageScore);
+  const averageScore = Number.isFinite(averageScoreNumber) ? Math.round(averageScoreNumber) : null;
+  const averageSleep = formatDurationFromHours(insights?.averageSleep);
 
   const handleAddSleepData = () => {
     window.location.hash = "/diario";
@@ -56,6 +58,33 @@ export default function DashboardPage() {
     }, 60000);
 
     return () => window.clearInterval(intervalId);
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadDashboardData() {
+      try {
+        const [historyResponse, insightsResponse] = await Promise.all([
+          getSleepHistory(1, 7),
+          getInsights()
+        ]);
+
+        if (!isMounted) {
+          return;
+        }
+
+        setHistoryRecords(Array.isArray(historyResponse?.items) ? historyResponse.items : []);
+        setInsights(insightsResponse || null);
+      } catch (error) {
+        console.error("Erro ao carregar dashboard:", error);
+      }
+    }
+
+    loadDashboardData();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   return (
@@ -83,12 +112,14 @@ export default function DashboardPage() {
                 <circle className="score-ring__value" cx="128" cy="128" r="110" />
               </svg>
               <div>
-                <strong>85</strong>
-                <span>Ótimo</span>
+                <strong>{averageScore ?? "--"}</strong>
+                <span>{averageScore === null ? "Sem dados" : "Pontuacao media"}</span>
               </div>
             </div>
             <p>
-              Seu sono foi mais restaurador do que em <strong>82%</strong> das suas noites habituais.
+              {historyRecords.length > 0
+                ? "Esse valor considera apenas os registros reais retornados pelo backend."
+                : "Sem registros suficientes para calcular sua pontuacao de sono."}
             </p>
           </section>
 
@@ -98,15 +129,15 @@ export default function DashboardPage() {
               <MetricCard
                 icon={<MaterialIcon>schedule</MaterialIcon>}
                 label="Tempo total"
-                value="7h 42m"
-                detail="+12m vs ontem"
+                value={latestRecord ? formatDurationFromHours(latestRecord.durationInHours) : "Nao informado"}
+                detail="Ultimo registro recebido"
                 color="secondary"
               />
               <MetricCard
                 icon={<MaterialIcon>bedtime</MaterialIcon>}
-                label="Sono Profundo"
-                value="2h 15m"
-                detail="Meta atingida"
+                label="Sono medio"
+                value={averageSleep}
+                detail="Calculado pelos insights"
                 color="primary"
               />
               <div className="efficiency-card">
@@ -115,9 +146,9 @@ export default function DashboardPage() {
                 </div>
                 <div>
                   <h4>Eficiência do Sono</h4>
-                  <p>Você acordou apenas 1 vez.</p>
+                  <p>{averageScore === null ? "Nao informado" : "Baseada na pontuacao media de sono."}</p>
                 </div>
-                <strong>94%</strong>
+                <strong>{averageScore === null ? "--" : `${averageScore}%`}</strong>
               </div>
             </div>
           </section>
@@ -137,26 +168,22 @@ export default function DashboardPage() {
                 </button>
               </div>
             </div>
-            <div className="bar-chart">
-              {bars.map(([day, height, active]) => (
-                <div className={active ? "bar-chart__item active" : "bar-chart__item"} key={day}>
-                  <span style={{ height: `${height}%` }} />
-                  <strong>{day}</strong>
-                </div>
-              ))}
-            </div>
+            <WeeklyBarChart bars={bars} />
           </section>
 
           <section className="tip-card">
             <img src={bedroomImage} alt="Quarto aconchegante para dormir" />
             <div>
-              <h4>Dica do Santuário</h4>
+              <h4>Dica do Santuario</h4>
               <p>
-                Julian, notamos que sua qualidade de sono aumenta quando você mantém a temperatura do quarto em 20°C.
-                Experimente ajustar o termostato esta noite.
+                {Array.isArray(insights?.recommendations) && insights.recommendations.length > 0
+                  ? insights.recommendations[0]
+                  : "Sem recomendacoes disponiveis no momento."}
               </p>
             </div>
-            <button className="btn btn--soft" type="button">Ver recomendações</button>
+            <button className="btn btn--soft" type="button" disabled={!Array.isArray(insights?.recommendations) || insights.recommendations.length === 0}>
+              Ver recomendacoes
+            </button>
           </section>
         </div>
       </main>

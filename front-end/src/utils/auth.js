@@ -35,14 +35,16 @@ export async function registerUser(userData) {
   }
 
   try {
+    const parsedHeight = userData.height ? parseFloat(userData.height) : 0;
+    const parsedWeight = userData.weight ? parseFloat(userData.weight) : 0;
     const payload = {
       name: userData.name,
       email: userData.email,
       password: userData.password,
       birthDate: userData.birthDate.split("/").reverse().join("-") + "T00:00:00", // convert DD/MM/YYYY to YYYY-MM-DDT00:00:00
       gender: userData.gender,
-      heightCm: userData.height ? parseFloat(userData.height) : null,
-      weightKg: userData.weight ? parseFloat(userData.weight) : null,
+      heightCm: Number.isFinite(parsedHeight) ? parsedHeight : 0,
+      weightKg: Number.isFinite(parsedWeight) ? parsedWeight : 0,
       occupation: userData.profession,
       sleepDisorder: 0 
     };
@@ -74,8 +76,13 @@ export async function loginUser(email, password) {
       
       try {
         const profile = await getUserProfile();
-        safeWrite(CURRENT_USER_STORAGE_KEY, profile);
-        return { success: true, user: profile };
+        const normalizedProfile = {
+          ...profile,
+          profession: profile?.profession || profile?.occupation || "",
+          occupation: profile?.occupation || profile?.profession || ""
+        };
+        safeWrite(CURRENT_USER_STORAGE_KEY, normalizedProfile);
+        return { success: true, user: normalizedProfile };
       } catch (err) {
         safeWrite(CURRENT_USER_STORAGE_KEY, { email });
         return { success: true, user: { email } };

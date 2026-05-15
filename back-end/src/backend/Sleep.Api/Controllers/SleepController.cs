@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Sleep.Api.Attributes;
+using Sleep.Application.UseCases.Sleep.Anlysis;
 using Sleep.Application.UseCases.Sleep.Create;
 using Sleep.Application.UseCases.Sleep.Get.SleepHistory;
 using Sleep.Communication.Requests.Sleep;
@@ -25,7 +26,6 @@ namespace Sleep.Api.Controllers
         }
 
 
-        //TODO - GET With Paging
         [HttpGet]
         [AuthenticadedUser]
         [ProducesResponseType(typeof(PagedList<ShortSleepRecord>), StatusCodes.Status200OK)]
@@ -38,5 +38,17 @@ namespace Sleep.Api.Controllers
             var result = await useCase.Execute(pageParameters, requestFilter);
             return Ok(result);
         }
+
+        [HttpPost("{recordId}/analysis")]
+        [AuthenticadedUser]
+        public async Task<IActionResult> DoSleepAnalysis(
+            [FromServices] IDoSleepAnalysisUseCase useCase,
+            [FromRoute] long recordId
+            )
+        {
+            await useCase.Execute(recordId);
+            return NoContent();
+        }
+
     }
 }

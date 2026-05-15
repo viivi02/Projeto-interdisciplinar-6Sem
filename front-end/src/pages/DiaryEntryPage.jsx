@@ -26,9 +26,9 @@ const initialDiaryState = {
 
 const activityOptions = ["Baixo", "Medio", "Alto"];
 const activityApiValues = {
-  Baixo: "low",
-  Medio: "medium",
-  Alto: "high"
+  Baixo: 15,
+  Medio: 30,
+  Alto: 60
 };
 
 function getCurrentDateParts() {
@@ -110,12 +110,16 @@ export default function DiaryEntryPage() {
       sleepEnd: wakeDate.toISOString().slice(0, 19),
       qualityOfSleep: Number(formData.sleepQuality),
       stressLevel: Number(formData.stressLevel),
-      physicalActivityMinutes: formData.physicalActivity === "Alto" ? 60 : formData.physicalActivity === "Medio" ? 30 : 0,
+      physicalActivityMinutes: activityApiValues[formData.physicalActivity] || 15,
       bmiCategory: 1,
       bloodPressure: formData.bloodPressure === "" ? 120 : Number(formData.bloodPressure),
       notes: `Atividade ${formData.physicalActivity} com qualidade ${formData.sleepQuality}/10 e estresse ${formData.stressLevel}/10.`,
       heartRate: formData.heartRate === "" ? 72 : Number(formData.heartRate),
-      dailySteps: formData.dailySteps === "" ? 5000 : Number(formData.dailySteps)
+      dailySteps: formData.dailySteps === "" ? 5000 : Number(formData.dailySteps),
+      mentalFatigue: Number(formData.mentalFatigue),
+      screenBeforeSleep: Boolean(formData.habits.screens),
+      caffeine: Boolean(formData.habits.caffeine),
+      alcohol: Boolean(formData.habits.alcohol)
     };
   };
 

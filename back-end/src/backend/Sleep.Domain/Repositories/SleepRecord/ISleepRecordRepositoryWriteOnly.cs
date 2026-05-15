@@ -4,6 +4,6 @@ namespace Sleep.Domain.Repositories.SleepRecord
 {
     public interface ISleepRecordRepositoryWriteOnly
     {
-        public Task Add(Entities.SleepRecord record);
+        public Task<long> Add(Entities.SleepRecord record);
     }
 }

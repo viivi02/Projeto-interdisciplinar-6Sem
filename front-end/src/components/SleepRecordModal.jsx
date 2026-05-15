@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import MaterialIcon from "./MaterialIcon.jsx";
 
-function formatValue(value, fallback = "Nao informado") {
+function formatValue(value, fallback = "Nao informant") {
   if (value === null || value === undefined || value === "") {
     return fallback;
   }
@@ -35,7 +35,7 @@ const detailGroups = [
   }
 ];
 
-export default function SleepRecordModal({ isOpen, onClose, record }) {
+export default function SleepRecordModal({ isOpen, onClose, record, isLoading = false }) {
   useEffect(() => {
     if (!isOpen) return undefined;
 
@@ -93,6 +93,7 @@ export default function SleepRecordModal({ isOpen, onClose, record }) {
                   {formatValue(record.goal, "Registro salvo")}
                 </span>
                 <h3>{formatValue(record.weekday)}</h3>
+                {isLoading ? <p>Carregando detalhes completos do registro...</p> : null}
               </div>
               <div className="sleep-record-modal__score">
                 <span>Score de sono</span>

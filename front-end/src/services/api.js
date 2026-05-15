@@ -1,22 +1,58 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://localhost:7062";
+const AUTH_TOKEN_STORAGE_KEY = "sleep-sanctuary-auth-token";
 
 function getAuthToken() {
   if (typeof window === "undefined") {
     return "";
   }
-  return window.localStorage.getItem("sleep-sanctuary-auth-token") || "";
+  return window.localStorage.getItem(AUTH_TOKEN_STORAGE_KEY) || "";
 }
 
 export function setAuthToken(token) {
   if (typeof window !== "undefined") {
-    window.localStorage.setItem("sleep-sanctuary-auth-token", token);
+    window.localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, token);
   }
 }
 
 export function removeAuthToken() {
   if (typeof window !== "undefined") {
-    window.localStorage.removeItem("sleep-sanctuary-auth-token");
+    window.localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
   }
+}
+
+function buildQuery(params = {}) {
+  const query = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") {
+      query.append(key, String(value));
+    }
+  });
+
+  const queryString = query.toString();
+  return queryString ? `?${queryString}` : "";
+}
+
+async function parseResponse(response) {
+  if (response.status === 204) {
+    return null;
+  }
+
+  const text = await response.text();
+  return text ? JSON.parse(text) : null;
+}
+
+function normalizeProfile(profile) {
+  if (!profile) {
+    return profile;
+  }
+
+  return {
+    ...profile,
+    profession: profile.profession || profile.occupation || "",
+    occupation: profile.occupation || profile.profession || "",
+    weight: profile.weight ?? "",
+    height: profile.height ?? ""
+  };
 }
 
 async function request(endpoint, options = {}) {
@@ -41,12 +77,15 @@ async function request(endpoint, options = {}) {
     throw new Error(errorBody || `Erro ${response.status} ao chamar ${endpoint}`);
   }
 
-  if (response.status === 204) {
+  return parseResponse(response);
+}
+
+async function requestOrNull(endpoint, options = {}) {
+  try {
+    return await request(endpoint, options);
+  } catch {
     return null;
   }
-
-  const text = await response.text();
-  return text ? JSON.parse(text) : null;
 }
 
 export function loginUser(email, password) {
@@ -71,20 +110,57 @@ export function saveSleepRecord(data) {
 }
 
 export function getSleepHistory(pageNumber = 1, pageSize = 20) {
-  return request(`/sleep?pageNumber=${pageNumber}&pageSize=${pageSize}`);
+  return request(`/sleep${buildQuery({ pageNumber, pageSize })}`);
 }
 
-export function getInsights() {
-  return request("/insights").catch(() => {
+export async function getInsights() {
+  const apiInsights = await requestOrNull("/insights");
+  if (apiInsights) {
+    return apiInsights;
+  }
+
+  const historyResponse = await getSleepHistory(1, 50).catch(() => null);
+  const records = Array.isArray(historyResponse?.items) ? historyResponse.items : [];
+
+  if (records.length === 0) {
     return {
-      averageSleep: 7.2,
-      averageScore: 75,
-      patterns: ["Sono irregular", "Alto uso de telas"],
-      recommendations: ["Reduzir uso de celular antes de dormir", "Manter horario fixo"]
+      averageSleep: 0,
+      averageScore: null,
+      patterns: ["Ainda nao ha registros suficientes para gerar padroes."],
+      recommendations: ["Preencha mais registros diarios para liberar insights personalizados."]
     };
-  });
+  }
+
+  const durations = records
+    .map((record) => Number(record.durationInHours))
+    .filter((value) => Number.isFinite(value) && value > 0);
+  const averageSleep = durations.length
+    ? durations.reduce((accumulator, value) => accumulator + value, 0) / durations.length
+    : 0;
+
+  return {
+    averageSleep,
+    averageScore: null,
+    patterns: [
+      `Foram analisados ${records.length} registros recentes.`,
+      `Media de sono aproximada: ${averageSleep.toFixed(1)} horas por noite.`
+    ],
+    recommendations: [
+      "Mantenha o registro diario para aumentar a precisao dos insights.",
+      "Tente manter horarios de dormir e acordar mais consistentes."
+    ]
+  };
 }
 
-export function getUserProfile() {
-  return request("/user");
+export async function getUserProfile() {
+  const profile = await request("/user");
+  return normalizeProfile(profile);
+}
+
+export async function getSleepRecordById(recordId) {
+  return request(`/sleep/${recordId}`);
+}
+
+export async function getSleepAnalysisByRecordId(recordId) {
+  return requestOrNull(`/sleep/${recordId}/analysis`);
 }

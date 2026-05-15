@@ -21,7 +21,8 @@ namespace Sleep.Application.Services.AutoMapper
 
             CreateMap<SleepRecord, ShortSleepRecord>()
                 .ForMember(dest => dest.RecordDate, opt => opt.MapFrom(src => src.RecordDate))
-                .ForMember(dest => dest.DurationInHours, opt => opt.MapFrom(src => src.DurationHours));
+                .ForMember(dest => dest.DurationInHours, opt => opt.MapFrom(src => src.DurationHours))
+                .ForMember(dest => dest.SleepRecordId, opt => opt.MapFrom(src => src.Id));
 
             CreateMap<PagedList<SleepRecord>, PagedList<ShortSleepRecord>>()
                 .ConvertUsing((src, _, context) =>

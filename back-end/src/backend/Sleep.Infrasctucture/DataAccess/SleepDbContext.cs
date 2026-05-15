@@ -9,6 +9,7 @@ namespace Sleep.Infrasctucture.DataAccess
 
         public DbSet<User> Users { get; set; }
         public DbSet<SleepRecord> SleepRecord { get; set; }
+        public DbSet<SleepAnalysis> SleepAnalysis { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {   

@@ -2,21 +2,24 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
 using Sleep.Application.Services.LoggedUser;
 using Sleep.Application.Tokens;
 using Sleep.Domain.Repositories;
+using Sleep.Domain.Repositories.SleepAnalysis;
+using Sleep.Domain.Repositories.SleepRecord;
 using Sleep.Domain.Repositories.User;
 using Sleep.Domain.Security.Cryptography;
 using Sleep.Infrasctructure.DataAccess;
+using Sleep.Infrasctructure.DataAccess.Repositories.SleepAnalysis;
+using Sleep.Infrasctructure.DataAccess.Repositories.SleepRecord;
 using Sleep.Infrasctructure.DataAccess.Repositories.User;
 using Sleep.Infrasctructure.Extensions;
+using Sleep.Infrasctructure.Messaging.Extensions;
 using Sleep.Infrasctructure.Security.Cryptography;
 using Sleep.Infrasctructure.Security.Token.Access;
 using Sleep.Infrasctructure.Services.LoggedUser;
 using Sleep.Infrasctucture.DataAccess;
-using Sleep.Domain.Repositories.SleepRecord;
-using Sleep.Infrasctructure.DataAccess.Repositories.SleepRecord;
+using System.Reflection;
 
 
 namespace Sleep.Infrasctucture
@@ -35,6 +38,7 @@ namespace Sleep.Infrasctucture
             var connectionString = configuration.ConnectionString();
             AddDbContext(services, connectionString!);
             AddFluentMigration(services, connectionString!);
+            RabbitMqExtensions.AddRabbitMq(services, configuration);
         }
         private static void AddDbContext(IServiceCollection services, string connectionString)
         {
@@ -53,6 +57,8 @@ namespace Sleep.Infrasctucture
             services.AddScoped<IUserRepositoryWriteOnly, UserRepository>();
             services.AddScoped<ISleepRecordRepositoryReadOnly, SleepRecordRepository>();
             services.AddScoped<ISleepRecordRepositoryWriteOnly, SleepRecordRepository>();
+            services.AddScoped<ISleepAnalysisRepositoryReadOnly, SleepAnalysisRepository>();
+            services.AddScoped<ISleepAnalysisRepositoryWriteOnly, SleepAnalysisRepository>();
         }
 
         private static void AddTokens(IServiceCollection services, IConfiguration configuration)

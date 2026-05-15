@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Sleep.Api.Attributes;
+using Sleep.Application.UseCases.User.Profile.Get;
 using Sleep.Application.UseCases.User.Register;
 using Sleep.Communication.Requests.User;
 using Sleep.Communication.Responses;
+using Sleep.Communication.Responses.User;
 
 namespace Sleep.Api.Controllers
 {
@@ -19,6 +22,17 @@ namespace Sleep.Api.Controllers
            var result = await useCase.Execute(requestBody);
 
            return Created(string.Empty, result);
+        }
+
+        [HttpGet]
+        [AuthenticadedUser]
+        [ProducesResponseType(typeof(ResponseUserProfile), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetUserProfile(
+            [FromServices] IGetUserProfileUseCase useCase
+            )
+        {
+            var response = await useCase.Execute();
+            return Ok(response);
         }
     }
 }

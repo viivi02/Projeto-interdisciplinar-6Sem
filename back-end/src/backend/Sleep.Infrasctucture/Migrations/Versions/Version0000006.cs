@@ -1,4 +1,5 @@
 ﻿using FluentMigrator;
+using FluentMigrator;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using Sleep.Infrastructure.Migrations;
 

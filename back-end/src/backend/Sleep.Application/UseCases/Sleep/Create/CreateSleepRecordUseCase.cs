@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using Sleep.Application.Services.LoggedUser;
+using Sleep.Application.UseCases.Sleep.Anlysis;
 using Sleep.Communication.Requests.Sleep;
 using Sleep.Communication.Utils;
 using Sleep.Domain.Entities;
+using Sleep.Domain.Messaging;
 using Sleep.Domain.Repositories;
 using Sleep.Domain.Repositories.SleepRecord;
 using Sleep.Exceptions.ExceptionsBase;
@@ -17,14 +19,16 @@ namespace Sleep.Application.UseCases.Sleep.Create
         private readonly ISleepRecordRepositoryWriteOnly _writeRepository;
         private readonly ISleepRecordRepositoryReadOnly _readRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IDoSleepAnalysisUseCase _analysisUseCase;
 
-        public CreateSleepRecordUseCase(IMapper mapper, ILoggedUser loggedUser, ISleepRecordRepositoryWriteOnly writeRepository, ISleepRecordRepositoryReadOnly readRepository, IUnitOfWork unitOfWork)
+        public CreateSleepRecordUseCase(IMapper mapper, ILoggedUser loggedUser, ISleepRecordRepositoryWriteOnly writeRepository, ISleepRecordRepositoryReadOnly readRepository, IUnitOfWork unitOfWork, IMessagePublisher messagePublisher, IDoSleepAnalysisUseCase analysisUseCase)
         {
             _mapper = mapper;
             _loggedUser = loggedUser;
             _writeRepository = writeRepository;
             _readRepository = readRepository;
             _unitOfWork = unitOfWork;
+            _analysisUseCase = analysisUseCase;
         }
 
         public async Task Execute(RequestCreateSleepRecord request)
@@ -47,8 +51,9 @@ namespace Sleep.Application.UseCases.Sleep.Create
 
             sleepRecord.RecordDate = recordDateOnly;
 
-            await _writeRepository.Add(sleepRecord);
+            var recordId = await _writeRepository.Add(sleepRecord);
             await _unitOfWork.Commit();
+            await _analysisUseCase.Execute(recordId);
         }
 
         public async Task Validate(RequestCreateSleepRecord request)

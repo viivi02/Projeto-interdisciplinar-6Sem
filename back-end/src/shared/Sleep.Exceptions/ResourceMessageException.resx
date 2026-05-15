@@ -186,4 +186,10 @@
   <data name="CAFFEINE_NOT_NULL" xml:space="preserve">
     <value>The caffeine field can't be null.</value>
   </data>
+  <data name="NOT_FOUND_EXCEPTION" xml:space="preserve">
+    <value>The value was not found. </value>
+  </data>
+  <data name="ALREADY_EXISTS_ANALYSIS" xml:space="preserve">
+    <value>Already exists analysis for this record.</value>
+  </data>
 </root>

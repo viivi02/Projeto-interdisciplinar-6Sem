@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Sleep.Api.Attributes;
 using Sleep.Application.UseCases.User.Profile.Get;
+using Sleep.Application.UseCases.User.Profile.Update;
 using Sleep.Application.UseCases.User.Register;
 using Sleep.Communication.Requests.User;
 using Sleep.Communication.Responses;
@@ -32,6 +33,17 @@ namespace Sleep.Api.Controllers
             )
         {
             var response = await useCase.Execute();
+            return Ok(response);
+        }
+
+        [HttpPut]
+        [AuthenticadedUser]
+        [ProducesResponseType(typeof(ResponseUserProfile), StatusCodes.Status200OK)]
+        public async Task<IActionResult> UpdateUserProfile(
+            [FromServices] IUpdateUserProfileUseCase useCase,
+            [FromBody] RequestUpdateUserJson requestBody)
+        {
+            var response = await useCase.Execute(requestBody);
             return Ok(response);
         }
     }

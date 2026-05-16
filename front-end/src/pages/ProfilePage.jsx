@@ -5,7 +5,7 @@ import MobileNav from "../components/MobileNav.jsx";
 import ProfileSettingsModal from "../components/ProfileSettingsModal.jsx";
 import SideNav from "../components/SideNav.jsx";
 import TopBar from "../components/TopBar.jsx";
-import { getUserProfile } from "../services/api.js";
+import { getUserProfile, updateUserProfile } from "../services/api.js";
 import { calculateBmi, formatBmi, getBmiClassification } from "../utils/health.js";
 import { getStoredProfile, saveStoredProfile } from "../utils/storage.js";
 
@@ -98,11 +98,19 @@ export default function ProfilePage({ currentTheme = "light", onThemeChange }) {
     };
   }, []);
 
-  const handleSettingsSave = (settings) => {
+  const handleSettingsSave = async (settings) => {
     const { theme, ...profileData } = settings;
-    const savedProfile = saveStoredProfile(profileData);
-    setProfileSettings(savedProfile);
     onThemeChange?.(theme);
+
+    try {
+      const updatedProfile = await updateUserProfile(profileData);
+      const savedProfile = saveStoredProfile(updatedProfile);
+      setProfileSettings(savedProfile);
+    } catch (error) {
+      console.error("Erro ao salvar perfil na API:", error);
+      const savedProfile = saveStoredProfile(profileData);
+      setProfileSettings(savedProfile);
+    }
   };
 
   return (

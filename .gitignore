@@ -3,3 +3,4 @@ data-mining-ai/service/models/*.pkl
 data-mining-ai/*.csv
 *.sln
 front-end/docs/backend-api.md
+.env

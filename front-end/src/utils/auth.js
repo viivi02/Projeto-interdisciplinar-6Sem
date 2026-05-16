@@ -1,4 +1,12 @@
-import { loginUser as apiLoginUser, registerUser as apiRegisterUser, setAuthToken, removeAuthToken, getUserProfile } from "../services/api.js";
+import {
+  loginUser as apiLoginUser,
+  registerUser as apiRegisterUser,
+  extractAccessToken,
+  getAuthToken,
+  setAuthToken,
+  removeAuthToken,
+  getUserProfile
+} from "../services/api.js";
 
 const AUTH_FLAG_STORAGE_KEY = "sleep-sanctuary-is-authenticated";
 const CURRENT_USER_STORAGE_KEY = "sleep-sanctuary-current-user";
@@ -22,6 +30,18 @@ function safeWrite(key, value) {
   window.localStorage.setItem(key, JSON.stringify(value));
 }
 
+function clearSession() {
+  removeAuthToken();
+  if (typeof window !== "undefined") {
+    window.localStorage.removeItem(AUTH_FLAG_STORAGE_KEY);
+    window.localStorage.removeItem(CURRENT_USER_STORAGE_KEY);
+  }
+}
+
+function markAuthenticated() {
+  safeWrite(AUTH_FLAG_STORAGE_KEY, true);
+}
+
 export async function registerUser(userData) {
   if (
     !userData.name ||
@@ -41,21 +61,24 @@ export async function registerUser(userData) {
       name: userData.name,
       email: userData.email,
       password: userData.password,
-      birthDate: userData.birthDate.split("/").reverse().join("-") + "T00:00:00", // convert DD/MM/YYYY to YYYY-MM-DDT00:00:00
+      birthDate: userData.birthDate.split("/").reverse().join("-") + "T00:00:00",
       gender: userData.gender,
       heightCm: Number.isFinite(parsedHeight) ? parsedHeight : 0,
       weightKg: Number.isFinite(parsedWeight) ? parsedWeight : 0,
       occupation: userData.profession,
-      sleepDisorder: 0 
+      sleepDisorder: 0
     };
 
     const response = await apiRegisterUser(payload);
-    
-    if (response && response.tokens && response.tokens.accessToken) {
-       setAuthToken(response.tokens.accessToken);
-       safeWrite(AUTH_FLAG_STORAGE_KEY, true);
-       safeWrite(CURRENT_USER_STORAGE_KEY, { name: response.name, email: payload.email });
+    const accessToken = extractAccessToken(response);
+
+    if (!accessToken) {
+      return { success: false, message: "Erro ao registrar usuário." };
     }
+
+    setAuthToken(accessToken);
+    markAuthenticated();
+    safeWrite(CURRENT_USER_STORAGE_KEY, { name: response.name || userData.name, email: payload.email });
 
     return {
       success: true,
@@ -69,27 +92,29 @@ export async function registerUser(userData) {
 export async function loginUser(email, password) {
   try {
     const response = await apiLoginUser(email, password);
-    
-    if (response && response.accessToken) {
-      setAuthToken(response.accessToken);
-      safeWrite(AUTH_FLAG_STORAGE_KEY, true);
-      
-      try {
-        const profile = await getUserProfile();
-        const normalizedProfile = {
-          ...profile,
-          profession: profile?.profession || profile?.occupation || "",
-          occupation: profile?.occupation || profile?.profession || ""
-        };
-        safeWrite(CURRENT_USER_STORAGE_KEY, normalizedProfile);
-        return { success: true, user: normalizedProfile };
-      } catch (err) {
-        safeWrite(CURRENT_USER_STORAGE_KEY, { email });
-        return { success: true, user: { email } };
-      }
+    const accessToken = extractAccessToken(response);
+
+    if (!accessToken) {
+      return { success: false, message: "Resposta de login inválida." };
     }
-    
-    return { success: false, message: "Resposta de login inválida." };
+
+    setAuthToken(accessToken);
+    markAuthenticated();
+
+    try {
+      const profile = await getUserProfile();
+      const normalizedProfile = {
+        ...profile,
+        email,
+        profession: profile?.profession || profile?.occupation || "",
+        occupation: profile?.occupation || profile?.profession || ""
+      };
+      safeWrite(CURRENT_USER_STORAGE_KEY, normalizedProfile);
+      return { success: true, user: normalizedProfile };
+    } catch {
+      safeWrite(CURRENT_USER_STORAGE_KEY, { email });
+      return { success: true, user: { email } };
+    }
   } catch (error) {
     return {
       success: false,
@@ -99,12 +124,7 @@ export async function loginUser(email, password) {
 }
 
 export function logoutUser() {
-  if (typeof window === "undefined") {
-    return;
-  }
-  removeAuthToken();
-  window.localStorage.removeItem(AUTH_FLAG_STORAGE_KEY);
-  window.localStorage.removeItem(CURRENT_USER_STORAGE_KEY);
+  clearSession();
 }
 
 export function getCurrentUser() {
@@ -112,7 +132,7 @@ export function getCurrentUser() {
 }
 
 export function isAuthenticated() {
-  return safeRead(AUTH_FLAG_STORAGE_KEY, false) === true;
+  return safeRead(AUTH_FLAG_STORAGE_KEY, false) === true && Boolean(getAuthToken());
 }
 
 export function updateCurrentUser(userData) {

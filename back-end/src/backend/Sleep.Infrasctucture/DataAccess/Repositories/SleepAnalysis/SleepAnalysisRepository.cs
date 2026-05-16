@@ -19,5 +19,15 @@ namespace Sleep.Infrasctructure.DataAccess.Repositories.SleepAnalysis
                 .Where(r => r.SleepRecordId == sleepRecord)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<IReadOnlyList<Domain.Entities.SleepAnalysis>> ListByUserIdAsync(long userId)
+        {
+            return await _dbContext.SleepAnalysis
+                .AsNoTracking()
+                .Where(analysis => 
+                    _dbContext.SleepRecord.Any(record =>
+                    record.Id == analysis.SleepRecordId && record.UserId == userId))
+                .ToListAsync();
+        }
     }
 }

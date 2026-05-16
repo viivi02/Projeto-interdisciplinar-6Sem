@@ -20,7 +20,10 @@ namespace Sleep.Api.Filters
         {
             var token = TokenOnRequest(context);
             if (string.IsNullOrEmpty(token))
+            {
+                context.Result = new UnauthorizedResult();
                 return;
+            }
 
             var userIdentifier = _accessTokenValidator.ValidateAndGetUserIdentifier(token);
             var userExists = await _repository.ExistActiveUserWithIdentifier(userIdentifier);

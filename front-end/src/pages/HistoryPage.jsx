@@ -12,7 +12,25 @@ import { getStoredDiaryEntries } from "../utils/storage.js";
 
 const filters = ["7 dias", "30 dias", "Este mes"];
 
+function getHistoryDateRange(filterLabel) {
+  const end = new Date();
+  const start = new Date();
+
+  if (filterLabel === "Este mes") {
+    start.setDate(1);
+  } else {
+    const days = filterLabel === "30 dias" ? 30 : 7;
+    start.setDate(end.getDate() - days);
+  }
+
+  return {
+    sleepStart: start.toISOString().slice(0, 10),
+    sleepEnd: end.toISOString().slice(0, 10)
+  };
+}
+
 export default function HistoryPage() {
+  const [activeFilter, setActiveFilter] = useState(filters[0]);
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const [records, setRecords] = useState(() => {
@@ -30,7 +48,8 @@ export default function HistoryPage() {
 
     async function loadHistory() {
       try {
-        const response = await getSleepHistory();
+        const dateRange = getHistoryDateRange(activeFilter);
+        const response = await getSleepHistory(1, 50, dateRange);
         const history = response?.items || response || [];
         if (isMounted && Array.isArray(history)) {
           setRecords(history.map(mapSleepHistoryRecord));
@@ -45,7 +64,7 @@ export default function HistoryPage() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [activeFilter]);
 
   const handleOpenRecord = async (record) => {
     setSelectedRecord(record);
@@ -86,8 +105,13 @@ export default function HistoryPage() {
             <p>Seus registros anteriores de sono organizados por data.</p>
           </div>
           <div className="history-filters" aria-label="Filtros do historico">
-            {filters.map((filter, index) => (
-              <button className={index === 0 ? "active" : ""} type="button" key={filter}>
+            {filters.map((filter) => (
+              <button
+                className={filter === activeFilter ? "active" : ""}
+                type="button"
+                key={filter}
+                onClick={() => setActiveFilter(filter)}
+              >
                 {filter}
               </button>
             ))}

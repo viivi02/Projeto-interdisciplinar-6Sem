@@ -14,6 +14,12 @@ namespace Sleep.Infrasctructure.DataAccess.Repositories.User
 
         public async Task Add(Domain.Entities.User user) => await _dbContext.AddAsync(user);
 
+        public Task Update(Domain.Entities.User user)
+        {
+            _dbContext.Users.Update(user);
+            return Task.CompletedTask;
+        }
+
 
         public async Task<bool> ExistUserWithEmail(string email)
         {

@@ -130,8 +130,6 @@ export default function ProfileSettingsModal({
             <select name="gender" value={formData.gender} onChange={handleChange}>
               <option value="Feminino">Feminino</option>
               <option value="Masculino">Masculino</option>
-              <option value="Outro">Outro</option>
-              <option value="Prefiro nao informar">Prefiro nao informar</option>
             </select>
           </Field>
 

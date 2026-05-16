@@ -9,6 +9,11 @@ using Sleep.Application.UseCases.Sleep.Anlysis;
 using Sleep.Application.UseCases.Sleep.Anlysis.Messaging;
 using Sleep.Application.UseCases.Sleep.Create;
 using Sleep.Application.UseCases.Sleep.Get.SleepHistory;
+using Sleep.Application.UseCases.Insights.Get;
+using Sleep.Application.UseCases.Sleep.Get.Analysis;
+using Sleep.Application.UseCases.Sleep.Get.ById;
+using Sleep.Application.UseCases.User.Profile.Get;
+using Sleep.Application.UseCases.User.Profile.Update;
 using Sleep.Application.UseCases.User.Register;
 using Sleep.Communication.Events;
 using Sleep.Domain.Messaging;
@@ -40,6 +45,11 @@ namespace Sleep.Application
             services.AddScoped<ICreateSleepRecordUseCase, CreateSleepRecordUseCase>();
             services.AddScoped<IGetSleepHistoryUseCase, GetSleepHistoryUseCase>();
             services.AddScoped<IDoSleepAnalysisUseCase, DoSleepAnalysisUseCase>();
+            services.AddScoped<IGetUserProfileUseCase, GetUserProfileUseCase>();
+            services.AddScoped<IUpdateUserProfileUseCase, UpdateUserProfileUseCase>();
+            services.AddScoped<IGetSleepRecordByIdUseCase, GetSleepRecordByIdUseCase>();
+            services.AddScoped<IGetSleepAnalysisUseCase, GetSleepAnalysisUseCase>();
+            services.AddScoped<IGetInsightsUseCase, GetInsightsUseCase>();
         }
 
         private static void AddPasswordEncrypter(IServiceCollection services, IConfiguration configuration)

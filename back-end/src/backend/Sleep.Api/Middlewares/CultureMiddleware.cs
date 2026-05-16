@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 
 namespace Sleep.Api.Middlewares
 {
@@ -17,11 +17,11 @@ namespace Sleep.Api.Middlewares
 
             var requestCulture = context.Request.Headers["Accept-Language"].FirstOrDefault();
 
-            var cultureInfo = new CultureInfo("en");
+            var cultureInfo = new CultureInfo("pt-BR");
 
             if (!string.IsNullOrEmpty(requestCulture) 
                 && supportedLanguages.Exists(c => c.Name.Equals(requestCulture)))
-            {
+                {
                 cultureInfo = new CultureInfo(requestCulture);
             }
             //CurrentCulture -> Default user local of the system. Number/Date formating 

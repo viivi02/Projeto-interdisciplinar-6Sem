@@ -2,9 +2,12 @@ import { formatBloodPressure, formatDate, formatQuality, formatWeekday } from ".
 
 export function mapSleepHistoryRecord(record) {
   const sleepScore = Number(record.sleepScore);
+  const recordId = record.sleepRecordId ?? record.id;
 
   return {
     ...record,
+    id: recordId,
+    sleepRecordId: recordId,
     date: formatDate(record.recordDate || record.date),
     weekday: formatWeekday(record.recordDate || record.date),
     duration: record.duration || (record.durationInHours ? `${record.durationInHours}h` : "Nao informado"),
@@ -34,10 +37,12 @@ export function mapSleepRecordDetails(baseRecord, detailRecord, analysisRecord) 
   return {
     ...baseRecord,
     ...detailRecord,
+    id: detailRecord.sleepRecordId ?? baseRecord.id,
+    sleepRecordId: detailRecord.sleepRecordId ?? baseRecord.sleepRecordId,
     date: formatDate(detailRecord.recordDate || detailRecord.date || baseRecord.date),
     weekday: formatWeekday(detailRecord.recordDate || detailRecord.date || baseRecord.date),
     duration: detailRecord.duration || (detailRecord.durationInHours ? `${detailRecord.durationInHours}h` : baseRecord.duration),
-    quality: formatQuality(detailRecord.sleepQuality ?? baseRecord.sleepQuality),
+    quality: formatQuality(detailRecord.sleepQuality ?? detailRecord.qualityOfSleep ?? baseRecord.sleepQuality),
     score: score || "Nao informado",
     sleepScore: Number.isFinite(Number(sleepScoreValue)) ? String(Math.round(Number(sleepScoreValue))) : baseRecord.sleepScore,
     stressLevel: Number.isFinite(Number(detailRecord.stressLevel)) ? `${detailRecord.stressLevel}/10` : baseRecord.stressLevel,

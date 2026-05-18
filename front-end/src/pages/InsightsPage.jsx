@@ -21,9 +21,24 @@ function buildQuickInsights(patterns) {
   }));
 }
 
+function getRestLevel(score) {
+  const value = Number(score);
+
+  if (!Number.isFinite(value)) {
+    return "Nao informado";
+  }
+
+  if (value >= 80) return "Alto";
+  if (value >= 60) return "Moderado";
+  return "Baixo";
+}
+
 export default function InsightsPage() {
   const [insights, setInsights] = useState(null);
   const [historyRecords, setHistoryRecords] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
   const displayedRecommendations = Array.isArray(insights?.recommendations) ? insights.recommendations : [];
   const displayedQuickInsights = buildQuickInsights(insights?.patterns);
   const trendBars = buildWeeklyBars(historyRecords);
@@ -32,35 +47,34 @@ export default function InsightsPage() {
     ? `${Math.round(Number(insights.averageScore))}%`
     : "Nao informado";
   const nightsInGoal = calculateGoalCount(historyRecords, 7);
-  const restLevel = Number.isFinite(Number(insights?.averageScore))
-    ? (Number(insights.averageScore) >= 80 ? "Alto" : Number(insights.averageScore) >= 60 ? "Moderado" : "Baixo")
-    : "Nao informado";
+  const goalProgress = historyRecords.length > 0 ? Math.round((nightsInGoal / historyRecords.length) * 100) : undefined;
+  const restLevel = getRestLevel(insights?.averageScore);
+  const validDurations = historyRecords
+    .map((record) => Number(record.durationInHours))
+    .filter((duration) => Number.isFinite(duration) && duration > 0);
+  const bestSleep = validDurations.length > 0 ? Math.max(...validDurations) : null;
+  const worstSleep = validDurations.length > 0 ? Math.min(...validDurations) : null;
+  const hasHistory = historyRecords.length > 0;
 
   useEffect(() => {
-    let isMounted = true;
-
-    async function loadInsights() {
-      try {
-        const data = await getInsights();
-        if (isMounted) {
-          setInsights(data);
-        }
-
-        const history = await getSleepHistory(1, 50);
-        if (isMounted) {
-          setHistoryRecords(Array.isArray(history?.items) ? history.items : []);
-        }
-      } catch (error) {
-        console.error("Erro ao buscar insights na API:", error);
-      }
-    }
-
     loadInsights();
-
-    return () => {
-      isMounted = false;
-    };
   }, []);
+
+  async function loadInsights() {
+    setErrorMessage("");
+    setLoading(true);
+
+    try {
+      const [data, history] = await Promise.all([getInsights(), getSleepHistory(1, 50)]);
+      setInsights(data);
+      setHistoryRecords(Array.isArray(history?.items) ? history.items : []);
+    } catch (error) {
+      console.error("Erro ao buscar insights na API:", error);
+      setErrorMessage("Nao foi possivel carregar os insights. Tente novamente em instantes.");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="app-shell">
@@ -72,19 +86,36 @@ export default function InsightsPage() {
             <h2>Insights</h2>
             <p>Leituras simples sobre sua rotina recente de descanso.</p>
           </div>
-          <button className="btn btn--primary btn--large" type="button">
-            <MaterialIcon>auto_awesome</MaterialIcon>
-            Atualizar Insights
+          <button
+            className="btn btn--primary btn--large"
+            type="button"
+            onClick={loadInsights}
+            disabled={loading}
+          >
+            <MaterialIcon>{loading ? "autorenew" : "auto_awesome"}</MaterialIcon>
+            {loading ? "Atualizando..." : "Atualizar Insights"}
           </button>
         </header>
+
+        {errorMessage && (
+          <section className="insights-state insights-state--error">
+            <span className="round-icon round-icon--secondary">
+              <MaterialIcon>error_outline</MaterialIcon>
+            </span>
+            <div>
+              <h3>Erro ao carregar insights</h3>
+              <p>{errorMessage}</p>
+            </div>
+          </section>
+        )}
 
         <div className="insights-grid">
           <section className="card insight-summary">
             <MaterialIcon className="insight-summary__ghost">nights_stay</MaterialIcon>
             <span className="kicker">Resumo geral</span>
-            <h3>{historyRecords.length > 0 ? "Resumo baseado nos registros recebidos" : "Sem dados suficientes"}</h3>
+            <h3>{hasHistory ? "Resumo baseado nos registros recebidos" : "Sem dados suficientes"}</h3>
             <p>
-              {historyRecords.length > 0
+              {hasHistory
                 ? "Os indicadores abaixo usam exclusivamente os dados reais retornados pelo backend."
                 : "Quando houver mais registros no backend, esta tela exibira os insights automaticamente."}
             </p>
@@ -105,9 +136,10 @@ export default function InsightsPage() {
             <MetricCard
               icon={<MaterialIcon>flag</MaterialIcon>}
               label="Meta atingida"
-              value={historyRecords.length > 0 ? `${nightsInGoal}/${historyRecords.length}` : "Nao informado"}
+              value={hasHistory ? `${nightsInGoal}/${historyRecords.length}` : "Nao informado"}
               detail="Noites dentro da meta"
               color="tertiary"
+              progress={goalProgress}
             />
             <MetricCard
               icon={<MaterialIcon>bolt</MaterialIcon>}
@@ -124,9 +156,39 @@ export default function InsightsPage() {
                 <h3>Evolucao semanal</h3>
                 <p>Tendencia de qualidade dos ultimos 7 registros</p>
               </div>
-              <span className="badge">{historyRecords.length > 0 ? `${historyRecords.length} registros` : "Sem dados"}</span>
+              <span className="badge">{hasHistory ? `${historyRecords.length} registros` : "Sem dados"}</span>
             </div>
             <WeeklyBarChart bars={trendBars} compact />
+          </section>
+
+          <section className="card insight-chart">
+            <div className="section-heading">
+              <div>
+                <h3>Dados de sono reais</h3>
+                <p>Registros dos ultimos dias usados para gerar os indicadores.</p>
+              </div>
+              <span className="badge">{hasHistory ? `${historyRecords.length} registros` : "Sem dados"}</span>
+            </div>
+            {hasHistory ? (
+              <>
+                <WeeklyBarChart bars={trendBars} />
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: "16px", marginTop: "24px" }}>
+                  <div>
+                    <span className="kicker">Maior descanso</span>
+                    <h4>{bestSleep ? formatDurationFromHours(bestSleep) : "Nao informado"}</h4>
+                  </div>
+                  <div>
+                    <span className="kicker">Menor descanso</span>
+                    <h4>{worstSleep ? formatDurationFromHours(worstSleep) : "Nao informado"}</h4>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="chart-empty">
+                <MaterialIcon>insights</MaterialIcon>
+                <p>Nenhum registro de sono suficiente foi encontrado ainda.</p>
+              </div>
+            )}
           </section>
 
           <section className="card insight-panel">
@@ -172,16 +234,6 @@ export default function InsightsPage() {
                 </li>
               )) : <li><span>Sem recomendacoes disponiveis no momento.</span></li>}
             </ul>
-          </section>
-
-          <section className="chart-placeholder">
-            <div>
-              <span className="round-icon round-icon--secondary">
-                <MaterialIcon>monitoring</MaterialIcon>
-              </span>
-              <h3>Espaco preparado para graficos</h3>
-              <p>Quando houver integracao com dados reais, esta area pode receber comparativos por mes, fases do sono ou fatores de rotina.</p>
-            </div>
           </section>
         </div>
       </main>
